@@ -123,8 +123,6 @@
             //const fieldOfView = 45 * Math.PI / 180;   // in radians
             var fieldOfView = fieldOfViewC1 * 0.0174533;
             const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-            const zNear = 0.1;
-            const zFar = 100.0;
             const projectionMatrix = mat4.create();
 
             // Put perspective matrix into "cameraMatrix" variable
@@ -821,16 +819,25 @@
         // Reset camera
         function resetCamera() {
             document.getElementById("c1Value").value = 45;
-            document.getElementById("c2Value").value = 40;
-            document.getElementById("c3Value").value = 30;
+            document.getElementById("c2Value").value = 0;
+            document.getElementById("c3Value").value = 0;
+            document.getElementById("c4Value").value = 0;
+            document.getElementById("c5Value").value = 0;
+            document.getElementById("c6Value").value = 0.1;
+            document.getElementById("c7Value").value = 500;
 
             document.getElementById("c1Label").textContent = 45;
-            document.getElementById("c2Label").textContent = 40;
-            document.getElementById("c3Label").textContent = 30;
+            document.getElementById("c2Label").textContent = 0;
+            document.getElementById("c3Label").textContent = 0;
+            document.getElementById("c4Label").textContent = 0;
+            document.getElementById("c5Label").textContent = 0;
+            document.getElementById("c6Label").textContent = 0.1;
+            document.getElementById("c7Label").textContent = 50;
 
-            rotateX = 0;
+            rotateX = 0, rotateY = 0, rotateZ = 0;
             fieldOfViewC1 = 45;
             zPosition = 0;
+            zNear = 1.0, zFar = 50;
             main();
 
             
@@ -850,12 +857,10 @@
         function changeC2value() {
             let c2Value = document.getElementById("c2Value").value;
             document.getElementById("c2Label").innerHTML = c2Value;
-
             // convert slider value to "radians" (by multiplying to 0.0174533) and put value into global variable "rotateX"
             rotateX = c2Value * 0.0174533;
             // calling the main() function
-            main();
-            
+            main();  
         }
 
         // z-Position
@@ -865,6 +870,43 @@
             zPosition = c3Value;
             main(); 
         }
+
+        // Camera rotate-y
+        function changeC4value() {
+            let c4Value = document.getElementById("c4Value").value;
+            document.getElementById("c4Label").innerHTML = c4Value;
+            // convert slider value to "radians" (by multiplying to 0.0174533) and put value into global variable "rotateX"
+            rotateY = c4Value * 0.0174533;
+            // calling the main() function
+            main();  
+        }
+
+        // Camera rotate-z
+        function changeC5value() {
+            let c5Value = document.getElementById("c5Value").value;
+            document.getElementById("c5Label").innerHTML = c5Value;
+            // convert slider value to "radians" (by multiplying to 0.0174533) and put value into global variable "rotateX"
+            rotateX = c5Value * 0.0174533;
+            // calling the main() function
+            main();  
+        }
+
+        // z-Near
+        function changeC6value() {
+            let c6Value = document.getElementById("c6Value").value / 10;
+            document.getElementById("c6Label").innerHTML = c6Value;
+            zNear = c6Value;
+            main();
+        }
+
+        // z-Far
+        function changeC7value() {
+            let c7Value = document.getElementById("c7Value").value / 10;
+            document.getElementById("c7Label").innerHTML = c7Value;
+            zFar = c7Value;
+            main();
+        }
+
 
         // ########################################### //
         // HELI TRANSFORMATION & COLOR functions
@@ -1127,7 +1169,9 @@
         <input type="button" id="resetBtn" value="Reset rotation" onclick="resetRotation()">
         <br><div class="sceneLabel">Forest scene: Lake, tree/bush, rock, boat and helicopter</div>
     </div>
+
     <canvas id="glCanvas" width="640" height="480"></canvas>
+
     <table width="640" cellpadding="0" cellspacing="5" border="0" align="center">
         <tr><td colspan="2" align="center" style="padding: 5px;">
             <b>CAMERA & PROJECTION</b>&nbsp;&nbsp;
@@ -1138,14 +1182,36 @@
             <td><input oninput="changeC1value()" id="c1Value" type="range" min="0" max="180" value="45" style="width: 100%"></td>
         </tr>
         <tr>
-            <td width="" align="right">Rotate-x (camera): <span id="c2Label">40&deg;</span></td>
-            <td><input oninput="changeC2value()" id="c2Value" type="range" min="0" max="100" value="40" style="width: 100%"></td>
+            <td width="" align="right">Rotate-x (camera): <span id="c2Label">0&deg;</span></td>
+            <td><input oninput="changeC2value()" id="c2Value" type="range" min="-180" max="180" value="0" style="width: 100%"></td>
         </tr>
         <tr>
-            <td width="" align="right">z-Position (camera): <span id="c3Label">30</span></td>
-            <td><input oninput="changeC3value()" id="c3Value" type="range" min="0" max="100" value="30" style="width: 100%"></td>
+            <td width="" align="right">Rotate-y (camera): <span id="c4Label">0&deg;</span></td>
+            <td><input oninput="changeC4value()" id="c4Value" type="range" min="-180" max="180" value="0" style="width: 100%"></td>
+        </tr>
+        <tr>
+            <td width="" align="right">Rotate-z (camera): <span id="c5Label">0&deg;</span></td>
+            <td><input oninput="changeC5value()" id="c5Value" type="range" min="-180" max="180" value="0" style="width: 100%"></td>
+        </tr>
+        <tr>
+            <td width="" align="right">z-Position (camera): <span id="c3Label">0</span></td>
+            <td><input oninput="changeC3value()" id="c3Value" type="range" min="-50" max="100" value="0" style="width: 100%"></td>
+        </tr>
+
+        <tr><td colspan="2" align="center" style="padding: 5px;">
+        <div><b>Z-NEAR & Z-FAR</b>&nbsp;&nbsp; </div>
+        </td></tr>
+
+        <tr>
+            <td width="" align="right">z-Near (camera): <span id="c6Label">0.1</span></td>
+            <td><input oninput="changeC6value()" id="c6Value" type="range" min="1" max="500" value="1" style="width: 100%"></td>
+        </tr>
+        <tr>
+            <td width="" align="right">z-Far (camera): <span id="c7Label">50</span></td>
+            <td><input oninput="changeC7value()" id="c7Value" type="range" min="1" max="500" value="500" style="width: 100%"></td>
         </tr>
         <tr><td colspan="2"><hr></td></tr>
+
     </table>
     <div><b>OBJECT TRANSFORMATION & COLOR</b></div>
     <table width="640" cellpadding="0" cellspacing="5" border="0" align="center">  
