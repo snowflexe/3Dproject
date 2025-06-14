@@ -120,7 +120,8 @@
             gl.enable(gl.DEPTH_TEST);           // Enable depth testing
             gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
 
-            const fieldOfView = 45 * Math.PI / 180;   // in radians
+            //const fieldOfView = 45 * Math.PI / 180;   // in radians
+            var fieldOfView = fieldOfViewC1 * 0.0174533;
             const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
             const zNear = 0.1;
             const zFar = 100.0;
@@ -135,7 +136,10 @@
                
             // Translate and rotate camera                    
             cameraMatrix = mat4.translate(cameraMatrix,cameraMatrix,[0, -1, -30]);   
-            cameraMatrix = mat4.rotateX(cameraMatrix,cameraMatrix,40 * 0.0174533);   
+            cameraMatrix = mat4.rotateX(cameraMatrix,cameraMatrix,40 * 0.0174533);
+            cameraMatrix = mat4.translate(cameraMatrix,cameraMatrix,[0, 0, -zPosition]);   
+
+
                                 
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // Clear the canvas before we start drawing on it.
 
@@ -560,6 +564,8 @@
         }
         // *******************************
         
+        var cubeRotation1 = 0.0, cubeRotation2 = 0.0, cubeRotation3 = 0.0;
+        var fieldOfViewC1 = 45, zNear = 0.1, zFar = 50, zPosition = 0, zPositionObj = -10;
         window.onload = main;
 
         // ########################################### //
@@ -814,22 +820,50 @@
 
         // Reset camera
         function resetCamera() {
+            document.getElementById("c1Value").value = 45;
+            document.getElementById("c2Value").value = 40;
+            document.getElementById("c3Value").value = 30;
+
+            document.getElementById("c1Label").textContent = 45;
+            document.getElementById("c2Label").textContent = 40;
+            document.getElementById("c3Label").textContent = 30;
+
+            rotateX = 0;
+            fieldOfViewC1 = 45;
+            zPosition = 0;
+            main();
+
             
         }
         
         // Field of view
         function changeC1value() {
+            let c1Value = parseInt(document.getElementById("c1Value").value, 10);
+            document.getElementById("c1Label").innerHTML = c1Value;
+            fieldOfViewC1 = c1Value;
+            
+            main();
             
         }
 
         // Camera rotate-x
         function changeC2value() {
+            let c2Value = document.getElementById("c2Value").value;
+            document.getElementById("c2Label").innerHTML = c2Value;
+
+            // convert slider value to "radians" (by multiplying to 0.0174533) and put value into global variable "rotateX"
+            rotateX = c2Value * 0.0174533;
+            // calling the main() function
+            main();
             
         }
 
         // z-Position
         function changeC3value() {
-            
+            let c3Value = document.getElementById("c3Value").value;
+            document.getElementById("c3Label").innerHTML = c3Value;
+            zPosition = c3Value;
+            main(); 
         }
 
         // ########################################### //
