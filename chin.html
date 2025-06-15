@@ -45,6 +45,12 @@
                 }
             `;
 
+            //Transparentcy
+
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+
             // Fragment shader program 
             const fsSource = `
                 varying lowp vec4 vColor;
@@ -162,52 +168,25 @@
             mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
             mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
 
-            // DRAW LAKE
-            // ###################################################### //
-            // Declare colorsBuffer & initialize it
-            var colorsBuffer = initBuffers(gl,positionsBox,lakeColors);
-            mat4.translate(modelViewMatrix,modelViewMatrix,[0,0.1,0]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[3.8,0.1,6]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            // // DRAW LAKE
+            // // ###################################################### //
+            // // Declare colorsBuffer & initialize it
+            // var colorsBuffer = initBuffers(gl,positionsBox,lakeColors);
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[0,0.1,0]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[3.8,0.1,6]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
-            mat4.translate(modelViewMatrix,modelViewMatrix,[-1.5,0,0.3]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[0.7,1,0.5]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[-1.5,0,0.3]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.7,1,0.5]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
-            mat4.translate(modelViewMatrix,modelViewMatrix,[4,0,-1.8]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,1,0.5]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-            // ###################################################### //
-
-            // Reset modelViewMatrix to draw another object
-            modelViewMatrix = mat4.create(); 
-            // Drag mouse to rotateX & rotateY
-            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
-            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
-            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
-
-            // DRAW TREE 
-            // ###################################################### //
-            // DRAW TREE 1
-            colorsBuffer = initBuffers(gl,positionsBox,brownColors); // TRUNK
-            mat4.translate(modelViewMatrix,modelViewMatrix,[5,1.3,-5.3]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[0.3,1,0.3]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            colorsBuffer = initBuffers(gl,positionsBox,leafColors); // LEAF
-            mat4.translate(modelViewMatrix,modelViewMatrix,[0,1.5,0]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[2.5,1,3]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            mat4.translate(modelViewMatrix,modelViewMatrix,[-0.3,1,-0.2]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.5,0.5]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[4,0,-1.8]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,1,0.5]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            // // ###################################################### //
 
             // Reset modelViewMatrix to draw another object
             modelViewMatrix = mat4.create(); 
@@ -216,60 +195,25 @@
             mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
             mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
 
-             // DRAW TREE 2
-            colorsBuffer = initBuffers(gl,positionsBox,brownColors); // TRUNK
-            mat4.translate(modelViewMatrix,modelViewMatrix,[-4.5,0.7,-4]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[0.3,0.7,0.3]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            // // DRAW TREE 
+            // // ###################################################### //
+            // // DRAW TREE 1
+            // colorsBuffer = initBuffers(gl,positionsBox,brownColors); // TRUNK
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[5,1.3,-5.3]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.3,1,0.3]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
-            colorsBuffer = initBuffers(gl,positionsBox,leafColors); // LEAF
-            mat4.translate(modelViewMatrix,modelViewMatrix,[0,1.5,0]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[2.5,1,3]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            // colorsBuffer = initBuffers(gl,positionsBox,leafColors); // LEAF
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[0,1.5,0]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[2.5,1,3]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
-            mat4.translate(modelViewMatrix,modelViewMatrix,[-0.3,1,-0.2]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.5,0.5]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // Reset modelViewMatrix to draw another object
-            modelViewMatrix = mat4.create(); 
-            // Drag mouse to rotateX & rotateY
-            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
-            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
-            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
-
-             // DRAW TREE 3
-            colorsBuffer = initBuffers(gl,positionsBox,brownColors); // TRUNK
-            mat4.translate(modelViewMatrix,modelViewMatrix,[-5.5,1,-2]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[0.3,1,0.3]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            colorsBuffer = initBuffers(gl,positionsBox,leafColors); // LEAF
-            mat4.translate(modelViewMatrix,modelViewMatrix,[0,1.5,0]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[2.5,1,3]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            mat4.translate(modelViewMatrix,modelViewMatrix,[-0.3,1,-0.2]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.5,0.5]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // DRAW BUSH 1
-            colorsBuffer = initBuffers(gl,positionsBox,leafColors); // LEAF
-            mat4.translate(modelViewMatrix,modelViewMatrix,[0,-5,16.7]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1,1]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // DRAW BUSH 2
-            mat4.translate(modelViewMatrix,modelViewMatrix,[-1.5,-0.5,0.6]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[-0.3,1,-0.2]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.5,0.5]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             // Reset modelViewMatrix to draw another object
             modelViewMatrix = mat4.create(); 
@@ -278,12 +222,74 @@
             mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
             mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
 
-             // DRAW TRUNK
-            colorsBuffer = initBuffers(gl,positionsBox,brownColors);
-            mat4.translate(modelViewMatrix,modelViewMatrix,[3.5,3.5,6]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[0.3,0.7,0.3]);
-            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            //  // DRAW TREE 2
+            // colorsBuffer = initBuffers(gl,positionsBox,brownColors); // TRUNK
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[-4.5,0.7,-4]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.3,0.7,0.3]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // colorsBuffer = initBuffers(gl,positionsBox,leafColors); // LEAF
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[0,1.5,0]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[2.5,1,3]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[-0.3,1,-0.2]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.5,0.5]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Reset modelViewMatrix to draw another object
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            //  // DRAW TREE 3
+            // colorsBuffer = initBuffers(gl,positionsBox,brownColors); // TRUNK
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[-5.5,1,-2]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.3,1,0.3]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // colorsBuffer = initBuffers(gl,positionsBox,leafColors); // LEAF
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[0,1.5,0]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[2.5,1,3]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[-0.3,1,-0.2]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.5,0.5]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // // DRAW BUSH 1
+            // colorsBuffer = initBuffers(gl,positionsBox,leafColors); // LEAF
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[0,-5,16.7]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[1,1,1]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // // DRAW BUSH 2
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[-1.5,-0.5,0.6]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // // Reset modelViewMatrix to draw another object
+            // modelViewMatrix = mat4.create(); 
+            // // Drag mouse to rotateX & rotateY
+            // mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            // mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            // mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            //  // DRAW TRUNK
+            // colorsBuffer = initBuffers(gl,positionsBox,brownColors);
+            // mat4.translate(modelViewMatrix,modelViewMatrix,[3.5,3.5,6]);
+            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.3,0.7,0.3]);
+            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
             // ###################################################### //
 
             // Reset modelViewMatrix to draw another object
@@ -386,12 +392,14 @@
             
             // FRONT SUB
 
+
             mat4.translate(frontMatrix,frontMatrix,[0,0,1.7]);
             let front1Matrix = mat4.clone(frontMatrix)         
             mat4.scale(frontMatrix,frontMatrix,[1.1,0.94,0.1]);    
             drawScene(gl, programInfo, colorsBuffer, frontMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
+            colorsBuffer = initBuffers(gl,positionsBox,MirrorColor);
             mat4.translate(front1Matrix,front1Matrix,[0,0.5,0]);
             mat4.rotateX(front1Matrix,front1Matrix,40 * 0.0174533);
             mat4.scale(front1Matrix,front1Matrix,[1,0.3,0.3]);    
@@ -455,6 +463,7 @@
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
+            colorsBuffer = initBuffers(gl,positionsBox,FrameColor);
             mat4.translate(modelViewMatrix,modelViewMatrix,[0,0,1]);
             //mat4.rotateY(modelViewMatrix,modelViewMatrix,TubeMove); 
             mat4.scale(modelViewMatrix,modelViewMatrix,[1.5,1.4,0.3]);    
@@ -478,7 +487,7 @@
 
             // WING (BACK SUB) WingMatrix,Wing1Matrix
 
-             colorsBuffer = initBuffers(gl,positionsBox,SubColor);
+            colorsBuffer = initBuffers(gl,positionsBox,SubColor);
             mat4.translate(WingMatrix,WingMatrix,[0,0.02,-2]);
             mat4.rotateX(WingMatrix,WingMatrix,170 * 0.0174533);
             mat4.rotateX(WingMatrix,WingMatrix,150 * 0.0174533); 
@@ -503,6 +512,7 @@
             drawScene(gl, programInfo, colorsBuffer, TailMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
+            colorsBuffer = initBuffers(gl,positionsBox,FrameColor);
             mat4.translate(TailMatrix,TailMatrix,[0,-0.05,-1]);
             mat4.scale(TailMatrix,TailMatrix,[1.3,1.3,0.2]);    
             drawScene(gl, programInfo, colorsBuffer, TailMatrix, projectionMatrix);
@@ -617,7 +627,9 @@
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
         }
+
         
+
         // Array for variance of greyColors
         var greyColors = [   
             [0.7,  0.7,  0.7, 1.0],    
@@ -627,6 +639,15 @@
             [0.7,  0.7,  0.7, 1.0],       
             [0.7,  0.7,  0.7, 1.0],      
             [0.7,  0.7,  0.7, 1.0],    
+        ];
+
+        var OceanColors = [
+            [0.29, 0.522, 0.949, 0.5],
+            [0.29, 0.522, 0.949, 0.5],
+            [0.29, 0.522, 0.949, 0.5],
+            [0.29, 0.522, 0.949, 0.5],
+            [0.29, 0.522, 0.949, 0.5],
+            [0.29, 0.522, 0.949, ],
         ];
 
         var darkGreyColors = [   
@@ -729,12 +750,12 @@
         ];
 
         var darkblueColors = [
-            [0.129, 0.196, 0.369, 1.0],
-            [0.129, 0.196, 0.369, 1.0],
-            [0.129, 0.196, 0.369, 1.0],
-            [0.129, 0.196, 0.369, 1.0],
-            [0.129, 0.196, 0.369, 1.0],
-            [0.129, 0.196, 0.369, 1.0],
+            [0.063, 0.067, 0.078, 1.0],
+            [0.063, 0.067, 0.078, 1.0],
+            [0.063, 0.067, 0.078, 1.0],
+            [0.063, 0.067, 0.078, 1.0],
+            [0.063, 0.067, 0.078, 1.0],
+            [0.063, 0.067, 0.078, 1.0],
         ];
 
         var rotateX = 0, rotateY = 0, rotateZ = 0;
@@ -1130,6 +1151,7 @@
         }
 
 
+
         // ########################################### //
         // Sub TRANSFORMATION & COLOR functions
         // ########################################### //
@@ -1245,7 +1267,7 @@
         }
 
         var MirrorColor = lightblueColors, MirrorColorBool = true;
-        function colorChild1() {
+        function colorSub3() {
             if (MirrorColorBool == true) { MirrorColorBool = false; } 
             else { MirrorColorBool = true; }
 
@@ -1256,7 +1278,7 @@
         }
 
         var FrameColor = darkblueColors, frameColorBool = true;
-        function colorChild1() {
+        function colorSub4() {
             if (frameColorBool == true) { frameColorBool = false; } 
             else { frameColorBool = true; }
 
@@ -1267,33 +1289,33 @@
         }
 
 
-        // var alphaP1Value = 1;
-        // function alphaParent1() {
-        //     alphaP1Value = document.getElementById("alphaParent1").value / 10; 
-        //     document.getElementById("aP1Label").innerHTML = parseFloat(alphaP1Value).toFixed(1);;
+        var alphaP1Value = 1;
+        function alphaParent1() {
+            alphaP1Value = document.getElementById("alphaParent1").value / 10; 
+            document.getElementById("aP1Label").innerHTML = parseFloat(alphaP1Value).toFixed(1);;
 
-        //     if (SubColorBool == true) {
-        //         SubColor = [ // pinkColors
-        //             [0.990, 0, 0.5, alphaP1Value],    
-        //             [0.990, 0, 0.5, alphaP1Value],    
-        //             [0.990, 0, 0.5, alphaP1Value],    
-        //             [0.990, 0, 0.5, alphaP1Value],    
-        //             [0.990, 0, 0.5, alphaP1Value],    
-        //             [0.990, 0, 0.5, alphaP1Value],    
-        //         ];
-        //     } else { 
-        //         SubColor = [ // blueColors
-        //             [0, 0, 1, alphaP1Value],    
-        //             [0, 0, 1, alphaP1Value],    
-        //             [0, 0, 1, alphaP1Value],    
-        //             [0, 0, 1, alphaP1Value],    
-        //             [0, 0, 1, alphaP1Value],    
-        //             [0, 0, 1, alphaP1Value],     
-        //         ];
-        //     }
+            if (SubColorBool == true) {
+                SubColor = [ // pinkColors
+                    [0.990, 0, 0.5, alphaP1Value],    
+                    [0.990, 0, 0.5, alphaP1Value],    
+                    [0.990, 0, 0.5, alphaP1Value],    
+                    [0.990, 0, 0.5, alphaP1Value],    
+                    [0.990, 0, 0.5, alphaP1Value],    
+                    [0.990, 0, 0.5, alphaP1Value],    
+                ];
+            } else { 
+                SubColor = [ // blueColors
+                    [0, 0, 1, alphaP1Value],    
+                    [0, 0, 1, alphaP1Value],    
+                    [0, 0, 1, alphaP1Value],    
+                    [0, 0, 1, alphaP1Value],    
+                    [0, 0, 1, alphaP1Value],    
+                    [0, 0, 1, alphaP1Value],     
+                ];
+            }
 
-        //     main();
-        // }
+            main();
+        }
 
         // ########################################### //
         // BOAT TRANSFORMATION & COLOR functions
