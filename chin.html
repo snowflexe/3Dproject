@@ -351,13 +351,19 @@
             // ###################################################### //
 
             // DRAW SUBMARINE BASE
-            colorsBuffer = initBuffers(gl,positionsBox,heliColor);
-            mat4.rotateY(modelViewMatrix,modelViewMatrix,-heliMove);    // Rotate heli towards 0,0 pivot 
+            colorsBuffer = initBuffers(gl,positionsBox,SubColor);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-SubMove);    // Rotate Sub towards 0,0 pivot 
 
             // Do this first before rotating towards the pivot
             mat4.translate(modelViewMatrix,modelViewMatrix,[7,8,0]);        
-            let rotorMatrix = mat4.clone(modelViewMatrix); // clone for later "DRAW HELI ROTOR" // Avoid distortion from other scalings
-            let frontMatrix = mat4.clone(modelViewMatrix)         
+            let rotorMatrix = mat4.clone(modelViewMatrix); // clone for later "DRAW SUB ROTOR" // Avoid distortion from other scalings
+            let frontMatrix = mat4.clone(modelViewMatrix);   
+            let BackMatrix = mat4.clone(modelViewMatrix);         
+            let WingMatrix = mat4.clone(modelViewMatrix);         
+            let Wing1Matrix = mat4.clone(modelViewMatrix);    
+            let TailMatrix = mat4.clone(modelViewMatrix);         
+            let windowMatrix = mat4.clone(modelViewMatrix);         
+    
             mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,1,1.7]);              
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
@@ -403,22 +409,52 @@
             mat4.scale(front1Matrix,front1Matrix,[1,1,1.6]);    
             drawScene(gl, programInfo, colorsBuffer, front1Matrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+
+            // BACK SUB
+
+            mat4.translate(BackMatrix,BackMatrix,[0,0,-1.7]);
+            let Back1Matrix = mat4.clone(BackMatrix)         
+            mat4.scale(BackMatrix,BackMatrix,[1.1,0.94,0.1]);    
+            drawScene(gl, programInfo, colorsBuffer, BackMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(Back1Matrix,Back1Matrix,[0,0.5,0]);
+            mat4.rotateX(Back1Matrix,Back1Matrix,40 * 0.0174533);
+            mat4.scale(Back1Matrix,Back1Matrix,[1,0.3,0.3]);    
+            drawScene(gl, programInfo, colorsBuffer, Back1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(Back1Matrix,Back1Matrix,[0,-2.4,2.1]);
+            mat4.rotateX(Back1Matrix,Back1Matrix,1 * 0.0174533);
+            mat4.scale(Back1Matrix,Back1Matrix,[1,1,1]);    
+            drawScene(gl, programInfo, colorsBuffer, Back1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(Back1Matrix,Back1Matrix,[0,0.8,-1.2]);
+            mat4.rotateX(Back1Matrix,Back1Matrix,47.5 * 0.0174533);
+            mat4.scale(Back1Matrix,Back1Matrix,[1,1,1.6]);    
+            drawScene(gl, programInfo, colorsBuffer, Back1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
 
             // DRAW TUBE 
             
             mat4.translate(TubeMatrix,TubeMatrix,[0,1.1,0.25]);
             mat4.rotateX(TubeMatrix,TubeMatrix,50 * 0.0174533);
+            //mat4.rotateX(TubeMatrix,TubeMatrix,TubeMove); 
             mat4.scale(TubeMatrix,TubeMatrix,[0.5,0.5,0.3]);     
             drawScene(gl, programInfo, colorsBuffer, TubeMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             mat4.translate(modelViewMatrix,modelViewMatrix,[0,1.35,2.7]);
+            //mat4.rotateX(modelViewMatrix,modelViewMatrix,TubeMove); 
             mat4.scale(modelViewMatrix,modelViewMatrix,[1.0,0.3,1.3]);    
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             mat4.translate(modelViewMatrix,modelViewMatrix,[0,0,1]);
+            //mat4.rotateX(modelViewMatrix,modelViewMatrix,TubeMove); 
             mat4.scale(modelViewMatrix,modelViewMatrix,[1.5,1.4,0.3]);    
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
@@ -426,22 +462,103 @@
             // TUBE (GLASS)
             
             mat4.translate(modelViewMatrix,modelViewMatrix,[0,0,1.2]);
+            //mat4.rotateX(modelViewMatrix,modelViewMatrix,TubeMove); 
             mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,0.8,0.3]);    
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             mat4.translate(modelViewMatrix,modelViewMatrix,[0,0,1.2]);
+            //mat4.rotateX(modelViewMatrix,modelViewMatrix,TubeMove); 
             mat4.scale(modelViewMatrix,modelViewMatrix,[0.8,0.7,0.3]);    
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
-            // DRAW HELI ROTOR using "rotorMatrix"
+            // WING (BACK SUB) WingMatrix,Wing1Matrix
+
+            mat4.translate(WingMatrix,WingMatrix,[0,0.02,-2]);
+            mat4.rotateX(WingMatrix,WingMatrix,170 * 0.0174533);
+            mat4.rotateX(WingMatrix,WingMatrix,150 * 0.0174533); 
+            mat4.scale(WingMatrix,WingMatrix,[0.13,1,0.3]); 
+            mat4.rotateX(WingMatrix,WingMatrix,25 * 0.0174533); 
+            drawScene(gl, programInfo, colorsBuffer, WingMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(Wing1Matrix,Wing1Matrix,[0,-0.3,-1.9]);
+            mat4.rotateX(Wing1Matrix,Wing1Matrix,100 * 0.0174533);
+            mat4.rotateX(Wing1Matrix,Wing1Matrix,170 * 0.0174533);
+            mat4.rotateX(Wing1Matrix,Wing1Matrix,150 * 0.0174533); 
+            mat4.scale(Wing1Matrix,Wing1Matrix,[0.13,1,0.3]); 
+            mat4.rotateX(Wing1Matrix,Wing1Matrix,25 * 0.0174533); 
+            drawScene(gl, programInfo, colorsBuffer, Wing1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // TAIL (BACK SUB) TailMatrix
+
+            mat4.translate(TailMatrix,TailMatrix,[0,-0.05,-2.8]);
+            mat4.scale(TailMatrix,TailMatrix,[0.13,0.13,1]);    
+            drawScene(gl, programInfo, colorsBuffer, TailMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(TailMatrix,TailMatrix,[0,-0.05,-1]);
+            mat4.scale(TailMatrix,TailMatrix,[1.3,1.3,0.2]);    
+            drawScene(gl, programInfo, colorsBuffer, TailMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+
+            // Turbine 
             colorsBuffer = initBuffers(gl,positionsBox,rotorColor);
-            mat4.translate(rotorMatrix,rotorMatrix,[0,0.7,0]); 
+            mat4.translate(rotorMatrix,rotorMatrix,[0,-0.05,-3.8]); 
             mat4.rotateY(rotorMatrix,rotorMatrix,rotorMove); 
-            mat4.scale(rotorMatrix,rotorMatrix,[3,0.05,0.3]);   
+            mat4.scale(rotorMatrix,rotorMatrix,[0.15,0.8,0.05]);   
             drawScene(gl, programInfo, colorsBuffer, rotorMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // WINDOW windowMatrix
+
+            mat4.translate(windowMatrix,windowMatrix,[1.2,0,0.8]);
+            let window1Matrix = mat4.clone(windowMatrix);
+            let window2Matrix = mat4.clone(windowMatrix);      
+            mat4.scale(windowMatrix,windowMatrix,[0.08,0.4,0.4]);    
+            drawScene(gl, programInfo, colorsBuffer, windowMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(windowMatrix,windowMatrix,[0.5,0,0]);
+            mat4.scale(windowMatrix,windowMatrix,[1,-0.8,-0.8]);    
+            drawScene(gl, programInfo, colorsBuffer, windowMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(window1Matrix,window1Matrix,[0,0,-1.6]);         
+            mat4.scale(window1Matrix,window1Matrix,[0.08,0.4,0.4]);    
+            drawScene(gl, programInfo, colorsBuffer, window1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(window1Matrix,window1Matrix,[0.5,0,0]);
+            mat4.scale(window1Matrix,window1Matrix,[1,-0.8,-0.8]);    
+            drawScene(gl, programInfo, colorsBuffer, window1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(window2Matrix,window2Matrix,[-2.4,0,0]); 
+            let window3Matrix = mat4.clone(window2Matrix);          
+            mat4.scale(window2Matrix,window2Matrix,[0.08,0.4,0.4]);    
+            drawScene(gl, programInfo, colorsBuffer, window2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(window2Matrix,window2Matrix,[-0.5,0,0]);
+            mat4.scale(window2Matrix,window2Matrix,[1,-0.8,-0.8]);    
+            drawScene(gl, programInfo, colorsBuffer, window2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);        
+            
+            mat4.translate(window3Matrix,window3Matrix,[0,0,-1.6]); 
+            mat4.scale(window3Matrix,window3Matrix,[0.08,0.4,0.4]);    
+            drawScene(gl, programInfo, colorsBuffer, window3Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(window3Matrix,window3Matrix,[-0.5,0,0]);
+            mat4.scale(window3Matrix,window3Matrix,[1,-0.8,-0.8]);    
+            drawScene(gl, programInfo, colorsBuffer, window3Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);   
+
+
             // ###################################################### //
 
             // Reset modelViewMatrix to draw another object
@@ -976,18 +1093,18 @@
 
 
         // ########################################### //
-        // HELI TRANSFORMATION & COLOR functions
+        // Sub TRANSFORMATION & COLOR functions
         // ########################################### //
 
-        var heliBool = true, heliMove = 0, heliSpeed = 1;
-        var timer = setInterval(function(){ animateHeliMoveLoop() }, 10);
+        var SubBool = true, SubMove = 0, SubSpeed = 1;
+        var timer = setInterval(function(){ animateSubMoveLoop() }, 10);
 
         function stopParent1() {
-            if (heliBool == true) { heliBool = false; }
-            else { heliBool = true; }
+            if (SubBool == true) { SubBool = false; }
+            else { SubBool = true; }
 
-            if (heliBool == true) {
-                timer = setInterval(function(){ animateHeliMoveLoop() }, 10);
+            if (SubBool == true) {
+                timer = setInterval(function(){ animateSubMoveLoop() }, 10);
                 document.getElementById("stopParent1").value = "Stop Parent 1";
             } else {
                 clearInterval(timer);
@@ -995,25 +1112,26 @@
             }
         }
 
-        //function animateHeliMoveLoop() {
-            //if (heliMove > 360) { heliMove = 0; }
-            //else { heliMove = heliMove + (heliSpeed * 0.0174533);  }
+        //function animateSubMoveLoop() {
+            //if (SubMove > 360) { SubMove = 0; }
+            //else { SubMove = SubMove + (SubSpeed * 0.0174533);  }
             //main();
         //}
 
         function speedParent1() {
-            heliSpeed = document.getElementById("speedParent1").value; 
-            document.getElementById("sP1Label").innerHTML = heliSpeed;
+            SubSpeed = document.getElementById("speedParent1").value; 
+            document.getElementById("sP1Label").innerHTML = SubSpeed;
         }
 
-        var heliRotorBool = true, rotorMove = 0, rotorSpeed = 50;
+        var SubRotorBool = true, rotorMove = 0, rotorSpeed = 50;
+        var TubeBool = true, TubeMove = 0, TubeSpeed = 20;
         var timer2 = setInterval(function(){ animateRotorMoveLoop() }, 10);
 
         function stopChild1() {
-            if (heliRotorBool == true) { heliRotorBool = false; }
-            else { heliRotorBool = true; }
+            if (SubRotorBool == true) { SubRotorBool = false; }
+            else { SubRotorBool = true; }
 
-            if (heliRotorBool == true) {
+            if (SubRotorBool == true) {
                 timer2 = setInterval(function(){ animateRotorMoveLoop() }, 10);
                 document.getElementById("stopChild1").value = "Stop Child 1";
             } else {
@@ -1033,10 +1151,13 @@
             document.getElementById("sC1Label").innerHTML = rotorSpeed;
         }
 
-        var heliColor = pinkColors, heliColorBool = true;
+
+
+
+        var SubColor = pinkColors, SubColorBool = true;
         function colorParent1() {
-            if (heliColorBool == true) { heliColorBool = false; } 
-            else { heliColorBool = true; }
+            if (SubColorBool == true) { SubColorBool = false; } 
+            else { SubColorBool = true; }
 
             alphaParent1(); 
             main();
@@ -1058,8 +1179,8 @@
             alphaP1Value = document.getElementById("alphaParent1").value / 10; 
             document.getElementById("aP1Label").innerHTML = parseFloat(alphaP1Value).toFixed(1);;
 
-            if (heliColorBool == true) {
-                heliColor = [ // pinkColors
+            if (SubColorBool == true) {
+                SubColor = [ // pinkColors
                     [0.990, 0, 0.5, alphaP1Value],    
                     [0.990, 0, 0.5, alphaP1Value],    
                     [0.990, 0, 0.5, alphaP1Value],    
@@ -1068,7 +1189,7 @@
                     [0.990, 0, 0.5, alphaP1Value],    
                 ];
             } else { 
-                heliColor = [ // blueColors
+                SubColor = [ // blueColors
                     [0, 0, 1, alphaP1Value],    
                     [0, 0, 1, alphaP1Value],    
                     [0, 0, 1, alphaP1Value],    
@@ -1234,7 +1355,7 @@
     <div style="padding: 10px 0px 5px 0px;">
         <div style="padding-bottom:7px;">Drag mouse inside canvas to rotate ALL OBJECTS on x-axis and y-axis</div>
         <input type="button" id="resetBtn" value="Reset rotation" onclick="resetRotation()">
-        <br><div class="sceneLabel">Forest scene: Lake, tree/bush, rock, boat and helicopter</div>
+        <br><div class="sceneLabel">Forest scene: Lake, tree/bush, rock, boat and Submarine</div>
     </div>
 
     <canvas id="glCanvas" width="640" height="480"></canvas>
@@ -1284,7 +1405,7 @@
     <table width="640" cellpadding="0" cellspacing="5" border="0" align="center">  
         <tr>
             <td align="center">
-                <div class="objLabel">CD12345 ABBAS: Helicopter</div><br>
+                <div class="objLabel">CD12345 ABBAS: Submarine</div><br>
                 <input type="button" id="stopParent1" value="Stop Parent 1" onclick="stopParent1()" style="margin-bottom: 5px;">
                 &nbsp;[ <span id="sP1Label">1</span> ]
                 <br><input oninput="speedParent1()" id="speedParent1" type="range" min="1" max="10" value="1" style="width: 80%">
