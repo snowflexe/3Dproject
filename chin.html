@@ -413,6 +413,7 @@
 
             // BACK SUB
 
+            colorsBuffer = initBuffers(gl,positionsBox,SubColor);
             mat4.translate(BackMatrix,BackMatrix,[0,0,-1.7]);
             let Back1Matrix = mat4.clone(BackMatrix)         
             mat4.scale(BackMatrix,BackMatrix,[1.1,0.94,0.1]);    
@@ -439,42 +440,45 @@
 
 
             // DRAW TUBE 
-            
+
+            colorsBuffer = initBuffers(gl,positionsBox,SubColor);
             mat4.translate(TubeMatrix,TubeMatrix,[0,1.1,0.25]);
-            mat4.rotateX(TubeMatrix,TubeMatrix,50 * 0.0174533);
-            //mat4.rotateX(TubeMatrix,TubeMatrix,TubeMove); 
-            mat4.scale(TubeMatrix,TubeMatrix,[0.5,0.5,0.3]);     
+            mat4.rotateX(TubeMatrix,TubeMatrix,50 * 0.0174533); 
+            mat4.scale(TubeMatrix,TubeMatrix,[0.5,0.5,0.3]);  
+            //mat4.rotateZ(TubeMatrix,TubeMatrix,TubeMove);   
             drawScene(gl, programInfo, colorsBuffer, TubeMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             mat4.translate(modelViewMatrix,modelViewMatrix,[0,1.35,2.7]);
-            //mat4.rotateX(modelViewMatrix,modelViewMatrix,TubeMove); 
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,TubeMove); 
             mat4.scale(modelViewMatrix,modelViewMatrix,[1.0,0.3,1.3]);    
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             mat4.translate(modelViewMatrix,modelViewMatrix,[0,0,1]);
-            //mat4.rotateX(modelViewMatrix,modelViewMatrix,TubeMove); 
+            //mat4.rotateY(modelViewMatrix,modelViewMatrix,TubeMove); 
             mat4.scale(modelViewMatrix,modelViewMatrix,[1.5,1.4,0.3]);    
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             // TUBE (GLASS)
             
+            colorsBuffer = initBuffers(gl,positionsBox,MirrorColor);
             mat4.translate(modelViewMatrix,modelViewMatrix,[0,0,1.2]);
-            //mat4.rotateX(modelViewMatrix,modelViewMatrix,TubeMove); 
+            //mat4.rotateY(modelViewMatrix,modelViewMatrix,TubeMove); 
             mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,0.8,0.3]);    
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             mat4.translate(modelViewMatrix,modelViewMatrix,[0,0,1.2]);
-            //mat4.rotateX(modelViewMatrix,modelViewMatrix,TubeMove); 
+            //mat4.rotateY(modelViewMatrix,modelViewMatrix,TubeMove); 
             mat4.scale(modelViewMatrix,modelViewMatrix,[0.8,0.7,0.3]);    
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             // WING (BACK SUB) WingMatrix,Wing1Matrix
 
+             colorsBuffer = initBuffers(gl,positionsBox,SubColor);
             mat4.translate(WingMatrix,WingMatrix,[0,0.02,-2]);
             mat4.rotateX(WingMatrix,WingMatrix,170 * 0.0174533);
             mat4.rotateX(WingMatrix,WingMatrix,150 * 0.0174533); 
@@ -508,13 +512,13 @@
             // Turbine 
             colorsBuffer = initBuffers(gl,positionsBox,rotorColor);
             mat4.translate(rotorMatrix,rotorMatrix,[0,-0.05,-3.8]); 
-            mat4.rotateY(rotorMatrix,rotorMatrix,rotorMove); 
+            mat4.rotateZ(rotorMatrix,rotorMatrix,rotorMove); 
             mat4.scale(rotorMatrix,rotorMatrix,[0.15,0.8,0.05]);   
             drawScene(gl, programInfo, colorsBuffer, rotorMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             // WINDOW windowMatrix
-
+            colorsBuffer = initBuffers(gl,positionsBox,FrameColor);
             mat4.translate(windowMatrix,windowMatrix,[1.2,0,0.8]);
             let window1Matrix = mat4.clone(windowMatrix);
             let window2Matrix = mat4.clone(windowMatrix);      
@@ -522,37 +526,44 @@
             drawScene(gl, programInfo, colorsBuffer, windowMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
+            colorsBuffer = initBuffers(gl,positionsBox,MirrorColor);
             mat4.translate(windowMatrix,windowMatrix,[0.5,0,0]);
             mat4.scale(windowMatrix,windowMatrix,[1,-0.8,-0.8]);    
             drawScene(gl, programInfo, colorsBuffer, windowMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
+            colorsBuffer = initBuffers(gl,positionsBox,FrameColor);
             mat4.translate(window1Matrix,window1Matrix,[0,0,-1.6]);         
             mat4.scale(window1Matrix,window1Matrix,[0.08,0.4,0.4]);    
             drawScene(gl, programInfo, colorsBuffer, window1Matrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
+            colorsBuffer = initBuffers(gl,positionsBox,MirrorColor);
             mat4.translate(window1Matrix,window1Matrix,[0.5,0,0]);
             mat4.scale(window1Matrix,window1Matrix,[1,-0.8,-0.8]);    
             drawScene(gl, programInfo, colorsBuffer, window1Matrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
+            colorsBuffer = initBuffers(gl,positionsBox,FrameColor);
             mat4.translate(window2Matrix,window2Matrix,[-2.4,0,0]); 
             let window3Matrix = mat4.clone(window2Matrix);          
             mat4.scale(window2Matrix,window2Matrix,[0.08,0.4,0.4]);    
             drawScene(gl, programInfo, colorsBuffer, window2Matrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
+            colorsBuffer = initBuffers(gl,positionsBox,MirrorColor);
             mat4.translate(window2Matrix,window2Matrix,[-0.5,0,0]);
             mat4.scale(window2Matrix,window2Matrix,[1,-0.8,-0.8]);    
             drawScene(gl, programInfo, colorsBuffer, window2Matrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);        
             
+            colorsBuffer = initBuffers(gl,positionsBox,FrameColor);
             mat4.translate(window3Matrix,window3Matrix,[0,0,-1.6]); 
             mat4.scale(window3Matrix,window3Matrix,[0.08,0.4,0.4]);    
             drawScene(gl, programInfo, colorsBuffer, window3Matrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
+            colorsBuffer = initBuffers(gl,positionsBox,MirrorColor);
             mat4.translate(window3Matrix,window3Matrix,[-0.5,0,0]);
             mat4.scale(window3Matrix,window3Matrix,[1,-0.8,-0.8]);    
             drawScene(gl, programInfo, colorsBuffer, window3Matrix, projectionMatrix);
@@ -697,6 +708,33 @@
             [1, 0, 0, 1.0],
             [1, 0, 0, 1.0],
             [1, 0, 0, 1.0],
+        ];
+
+        var bluegreyColors = [
+            [0.592, 0.655, 0.82, 1.0],
+            [0.592, 0.655, 0.82, 1.0],
+            [0.592, 0.655, 0.82, 1.0],
+            [0.592, 0.655, 0.82, 1.0],
+            [0.592, 0.655, 0.82, 1.0],
+            [0.592, 0.655, 0.82, 1.0],
+        ];
+
+        var lightblueColors = [
+            [0.941, 0.957, 1, 1.0],
+            [0.941, 0.957, 1, 1.0],
+            [0.941, 0.957, 1, 1.0],
+            [0.941, 0.957, 1, 1.0],
+            [0.941, 0.957, 1, 1.0],
+            [0.941, 0.957, 1, 1.0],
+        ];
+
+        var darkblueColors = [
+            [0.129, 0.196, 0.369, 1.0],
+            [0.129, 0.196, 0.369, 1.0],
+            [0.129, 0.196, 0.369, 1.0],
+            [0.129, 0.196, 0.369, 1.0],
+            [0.129, 0.196, 0.369, 1.0],
+            [0.129, 0.196, 0.369, 1.0],
         ];
 
         var rotateX = 0, rotateY = 0, rotateZ = 0;
@@ -1096,35 +1134,35 @@
         // Sub TRANSFORMATION & COLOR functions
         // ########################################### //
 
-        var SubBool = true, SubMove = 0, SubSpeed = 1;
+        var SubBool = true, SubMove = 0, SubSpeed = 0.2;
         var timer = setInterval(function(){ animateSubMoveLoop() }, 10);
 
-        function stopParent1() {
+        function stopSubmarine() {
             if (SubBool == true) { SubBool = false; }
             else { SubBool = true; }
 
             if (SubBool == true) {
                 timer = setInterval(function(){ animateSubMoveLoop() }, 10);
-                document.getElementById("stopParent1").value = "Stop Parent 1";
+                document.getElementById("stopSubmarine").value = "Stop Submarine";
             } else {
                 clearInterval(timer);
-                document.getElementById("stopParent1").value = "Start Parent 1";
+                document.getElementById("stopSubmarine").value = "Start Submarine";
             }
         }
 
-        //function animateSubMoveLoop() {
-            //if (SubMove > 360) { SubMove = 0; }
-            //else { SubMove = SubMove + (SubSpeed * 0.0174533);  }
-            //main();
-        //}
-
-        function speedParent1() {
-            SubSpeed = document.getElementById("speedParent1").value; 
-            document.getElementById("sP1Label").innerHTML = SubSpeed;
+        function animateSubMoveLoop() {
+            if (SubMove > 360) { SubMove = 0; }
+            else { SubMove = SubMove + (SubSpeed * 0.0174533);  }
+            main();
         }
 
-        var SubRotorBool = true, rotorMove = 0, rotorSpeed = 50;
-        var TubeBool = true, TubeMove = 0, TubeSpeed = 20;
+        function speedSubmarine() {
+            SubSpeed = document.getElementById("speedSubmarine").value; 
+            document.getElementById("speedsubLabel").innerHTML = SubSpeed;
+        }
+
+        // Turbine
+        var SubRotorBool = true, rotorMove = 0, rotorSpeed = 50;;
         var timer2 = setInterval(function(){ animateRotorMoveLoop() }, 10);
 
         function stopChild1() {
@@ -1140,22 +1178,54 @@
             }
         }
 
-        //function animateRotorMoveLoop() {
-            //if (rotorMove > 360) { rotorMove = 0; }
-            //else { rotorMove = rotorMove + (rotorSpeed * 0.0174533);  }
-            //main();
-        //}
+        function animateRotorMoveLoop() {
+            if (rotorMove > 360) { rotorMove = 0; }
+            else { rotorMove = rotorMove + (rotorSpeed * 0.0174533);  }
+            main();
+        }
 
         function speedChild1() {
             rotorSpeed = document.getElementById("speedChild1").value; 
             document.getElementById("sC1Label").innerHTML = rotorSpeed;
         }
 
+        // Tube
+
+        var TubeBool = true, TubeSpinBool = true, TubeMove = -1, TubeSpeed = 0.5;
+        var timerTube = setInterval(function(){ animateTubeMoveLoop() }, 10);
+
+        function stopTube() {
+            if (TubeBool == true) { TubeBool = false; }
+            else { TubeBool = true; }
+
+            if (TubeBool == true) {
+                timerTube = setInterval(function(){ animateTubeMoveLoop() }, 10);
+                document.getElementById("stopTube").value = "Stop Tube";
+            } else {
+                clearInterval(timerTube);
+                document.getElementById("stopTube").value = "Start Tube";
+            }
+        }
+
+        function animateTubeMoveLoop() {
+            if (TubeMove <= -1) { TubeSpinBool = true; }
+            else if (TubeMove >= 1) { TubeSpinBool = false; }
+
+            if (TubeSpinBool == true) { TubeMove += (TubeSpeed * 0.0174533); }
+            else { TubeMove -= (TubeSpeed * 0.0174533); }
+
+            main();
+        }
+
+        function speedTube() {
+            TubeSpeed = document.getElementById("speedTube").value; 
+            document.getElementById("TubeLabel").innerHTML = TubeSpeed;
+        }
 
 
 
-        var SubColor = pinkColors, SubColorBool = true;
-        function colorParent1() {
+        var SubColor = bluegreyColors, SubColorBool = true;
+        function colorSub() {
             if (SubColorBool == true) { SubColorBool = false; } 
             else { SubColorBool = true; }
 
@@ -1164,7 +1234,7 @@
         }
 
         var rotorColor = darkGreyColors, rotorColorBool = true;
-        function colorChild1() {
+        function colorSub2() {
             if (rotorColorBool == true) { rotorColorBool = false; } 
             else { rotorColorBool = true; }
 
@@ -1174,33 +1244,56 @@
             main();
         }
 
-        var alphaP1Value = 1;
-        function alphaParent1() {
-            alphaP1Value = document.getElementById("alphaParent1").value / 10; 
-            document.getElementById("aP1Label").innerHTML = parseFloat(alphaP1Value).toFixed(1);;
+        var MirrorColor = lightblueColors, MirrorColorBool = true;
+        function colorChild1() {
+            if (MirrorColorBool == true) { MirrorColorBool = false; } 
+            else { MirrorColorBool = true; }
 
-            if (SubColorBool == true) {
-                SubColor = [ // pinkColors
-                    [0.990, 0, 0.5, alphaP1Value],    
-                    [0.990, 0, 0.5, alphaP1Value],    
-                    [0.990, 0, 0.5, alphaP1Value],    
-                    [0.990, 0, 0.5, alphaP1Value],    
-                    [0.990, 0, 0.5, alphaP1Value],    
-                    [0.990, 0, 0.5, alphaP1Value],    
-                ];
-            } else { 
-                SubColor = [ // blueColors
-                    [0, 0, 1, alphaP1Value],    
-                    [0, 0, 1, alphaP1Value],    
-                    [0, 0, 1, alphaP1Value],    
-                    [0, 0, 1, alphaP1Value],    
-                    [0, 0, 1, alphaP1Value],    
-                    [0, 0, 1, alphaP1Value],     
-                ];
-            }
+            if (MirrorColorBool == true) { MirrorColor = lightblueColors; }
+            else { MirrorColor = greyColors; }
 
             main();
         }
+
+        var FrameColor = darkblueColors, frameColorBool = true;
+        function colorChild1() {
+            if (frameColorBool == true) { frameColorBool = false; } 
+            else { frameColorBool = true; }
+
+            if (frameColorBool == true) { FrameColor = darkblueColors; }
+            else { FrameColor = greyColors; }
+
+            main();
+        }
+
+
+        // var alphaP1Value = 1;
+        // function alphaParent1() {
+        //     alphaP1Value = document.getElementById("alphaParent1").value / 10; 
+        //     document.getElementById("aP1Label").innerHTML = parseFloat(alphaP1Value).toFixed(1);;
+
+        //     if (SubColorBool == true) {
+        //         SubColor = [ // pinkColors
+        //             [0.990, 0, 0.5, alphaP1Value],    
+        //             [0.990, 0, 0.5, alphaP1Value],    
+        //             [0.990, 0, 0.5, alphaP1Value],    
+        //             [0.990, 0, 0.5, alphaP1Value],    
+        //             [0.990, 0, 0.5, alphaP1Value],    
+        //             [0.990, 0, 0.5, alphaP1Value],    
+        //         ];
+        //     } else { 
+        //         SubColor = [ // blueColors
+        //             [0, 0, 1, alphaP1Value],    
+        //             [0, 0, 1, alphaP1Value],    
+        //             [0, 0, 1, alphaP1Value],    
+        //             [0, 0, 1, alphaP1Value],    
+        //             [0, 0, 1, alphaP1Value],    
+        //             [0, 0, 1, alphaP1Value],     
+        //         ];
+        //     }
+
+        //     main();
+        // }
 
         // ########################################### //
         // BOAT TRANSFORMATION & COLOR functions
@@ -1405,20 +1498,29 @@
     <table width="640" cellpadding="0" cellspacing="5" border="0" align="center">  
         <tr>
             <td align="center">
-                <div class="objLabel">CD12345 ABBAS: Submarine</div><br>
-                <input type="button" id="stopParent1" value="Stop Parent 1" onclick="stopParent1()" style="margin-bottom: 5px;">
-                &nbsp;[ <span id="sP1Label">1</span> ]
-                <br><input oninput="speedParent1()" id="speedParent1" type="range" min="1" max="10" value="1" style="width: 80%">
+                <div class="objLabel">CD24067 CHIN JIA YIN: Submarine</div><br>
+                <!-- parent -->
+                <input type="button" id="stopSubmarine" value="Stop Submarine" onclick="stopSubmarine()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="speedsubLabel">1</span> ]
+                <br><input oninput="speedSubmarine()" id="speedSubmarine" type="range" min="1" max="10" value="1" style="width: 80%">
                 <hr width="80%">
+                <!-- child 1 -->
                 <input type="button" id="stopChild1" value="Stop Child 1" onclick="stopChild1()" style="margin-bottom: 5px;">
                 &nbsp;[ <span id="sC1Label">30</span> ]
                 <br><input oninput="speedChild1()" id="speedChild1" type="range" min="1" max="100" value="30" style="width: 80%">
                 <hr width="80%">
+                <!-- child 2 -->
+                <input type="button" id="stopTube" value="Stop Tube" onclick="stopTube()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="TubeLabel">30</span> ]
+                <br><input oninput="speedTube()" id="speedTube" type="range" min="1" max="100" value="30" style="width: 80%">
+                <hr width="80%">
+                <!-- color -->
                 RGB[A: <span id="aP1Label">1.0</span>]&nbsp; 
-                <input type="button" id="colorParent1" value="Parent 1" onclick="colorParent1()" style="margin-bottom: 5px;">
-                <input type="button" id="colorChild1" value="Child 1" onclick="colorChild1()" style="margin-bottom: 5px;">
+                <input type="button" id="colorSub" value="Sub" onclick="colorSub()" style="margin-bottom: 5px;">
+                <input type="button" id="colorSub2" value="Turbine" onclick="colorSub2()" style="margin-bottom: 5px;">
                 <br><input oninput="alphaParent1()" id="alphaParent1" type="range" min="0" max="10" value="10" style="width: 80%">
             </td>
+
             <td align="center">
                 <div class="objLabel">CD54321 SALIIMI: Boat</div><br>
                 <input type="button" id="stopParent2" value="Stop Parent 2" onclick="stopParent2()" style="margin-bottom: 5px;">
