@@ -156,7 +156,7 @@
 
             // DRAW BASE PLATE
             // ###################################################### //
-            colorsBuffer = initBuffers(gl,positionsBox,greyColors);
+            colorsBuffer = initBuffers(gl,positionsBox,OceanColors);
             mat4.scale(modelViewMatrix,modelViewMatrix,[10,0.1,10]);
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
@@ -168,132 +168,46 @@
             mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
             mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
 
-            // // DRAW LAKE
-            // // ###################################################### //
-            // // Declare colorsBuffer & initialize it
-            // var colorsBuffer = initBuffers(gl,positionsBox,lakeColors);
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[0,0.1,0]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[3.8,0.1,6]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[-1.5,0,0.3]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.7,1,0.5]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[4,0,-1.8]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,1,0.5]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-            // // ###################################################### //
-
-            // Reset modelViewMatrix to draw another object
-            modelViewMatrix = mat4.create(); 
-            // Drag mouse to rotateX & rotateY
-            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
-            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
-            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
-
-            // // DRAW TREE 
-            // // ###################################################### //
-            // // DRAW TREE 1
-            // colorsBuffer = initBuffers(gl,positionsBox,brownColors); // TRUNK
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[5,1.3,-5.3]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.3,1,0.3]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // colorsBuffer = initBuffers(gl,positionsBox,leafColors); // LEAF
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[0,1.5,0]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[2.5,1,3]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[-0.3,1,-0.2]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.5,0.5]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // Reset modelViewMatrix to draw another object
-            modelViewMatrix = mat4.create(); 
-            // Drag mouse to rotateX & rotateY
-            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
-            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
-            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
-
-            //  // DRAW TREE 2
-            // colorsBuffer = initBuffers(gl,positionsBox,brownColors); // TRUNK
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[-4.5,0.7,-4]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.3,0.7,0.3]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // colorsBuffer = initBuffers(gl,positionsBox,leafColors); // LEAF
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[0,1.5,0]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[2.5,1,3]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[-0.3,1,-0.2]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.5,0.5]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // Reset modelViewMatrix to draw another object
-            modelViewMatrix = mat4.create(); 
-            // Drag mouse to rotateX & rotateY
-            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
-            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
-            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
-
-            //  // DRAW TREE 3
-            // colorsBuffer = initBuffers(gl,positionsBox,brownColors); // TRUNK
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[-5.5,1,-2]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.3,1,0.3]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // colorsBuffer = initBuffers(gl,positionsBox,leafColors); // LEAF
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[0,1.5,0]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[2.5,1,3]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[-0.3,1,-0.2]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.5,0.5]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // // DRAW BUSH 1
-            // colorsBuffer = initBuffers(gl,positionsBox,leafColors); // LEAF
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[0,-5,16.7]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[1,1,1]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // // DRAW BUSH 2
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[-1.5,-0.5,0.6]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-            // // Reset modelViewMatrix to draw another object
-            // modelViewMatrix = mat4.create(); 
-            // // Drag mouse to rotateX & rotateY
-            // mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
-            // mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
-            // mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
-
-            //  // DRAW TRUNK
-            // colorsBuffer = initBuffers(gl,positionsBox,brownColors);
-            // mat4.translate(modelViewMatrix,modelViewMatrix,[3.5,3.5,6]);
-            // mat4.scale(modelViewMatrix,modelViewMatrix,[0.3,0.7,0.3]);
-            // drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
-            // gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            // DRAW STONE
             // ###################################################### //
 
-            // Reset modelViewMatrix to draw another object
+            colorsBuffer = initBuffers(gl,positionsBox,darkGreyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-5,0.7,-9]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.6,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.5,0.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,30 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[-1,0.5,-1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2.5,-0.3,1.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.3,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,-0.3,0.8]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,-0.6,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,0.7,-2]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,2,1.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.8,2]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.9,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
             modelViewMatrix = mat4.create(); 
+
             // Drag mouse to rotateX & rotateY
             mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
             mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
@@ -301,47 +215,1081 @@
 
             // DRAW STONE
             // ###################################################### //
+
             colorsBuffer = initBuffers(gl,positionsBox,darkGreyColors);
-            mat4.translate(modelViewMatrix,modelViewMatrix,[3,1.5,5.5]);
-            mat4.scale(modelViewMatrix,modelViewMatrix,[1.3,1.5,1.2]);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-2,0.7,-9]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.6,0.5]);
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.5,0.5]);
             mat4.rotateY(modelViewMatrix,modelViewMatrix,30 * 0.0174533);  
-            mat4.scale(modelViewMatrix,modelViewMatrix,[-0.7,0.5,-0.7]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[-1,0.5,-1]);
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
-            mat4.translate(modelViewMatrix,modelViewMatrix,[2.5,0.3,1.5]);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2.5,-0.3,1.5]);
             mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
-            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.3,1]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.3,0.7]);
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
-            modelViewMatrix = mat4.create(); 
-            // Drag mouse to rotateX & rotateY
-            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
-            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
-            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
-
-            mat4.translate(modelViewMatrix,modelViewMatrix,[5,0.3,-5]);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,-0.3,0.8]);
             mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
-            mat4.scale(modelViewMatrix,modelViewMatrix,[1.5,0.3,1]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,-0.6,0.7]);
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
-            modelViewMatrix = mat4.create(); 
-            // Drag mouse to rotateX & rotateY
-            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
-            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
-            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
-
-            mat4.translate(modelViewMatrix,modelViewMatrix,[-6,0.4,5.5]);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,0.7,-2]);
             mat4.rotateY(modelViewMatrix,modelViewMatrix,10 * 0.0174533);  
-            mat4.scale(modelViewMatrix,modelViewMatrix,[1.5,0.4,0.9]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,2,1.5]);
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.8,2]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.9,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            // DRAW STONE
+            // ###################################################### //
+
+            colorsBuffer = initBuffers(gl,positionsBox,darkGreyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2,0.7,-9]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.6,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.5,0.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,30 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[-1,0.5,-1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2.5,-0.3,1.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.3,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,-0.3,0.8]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,-0.6,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,0.7,-2]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,2,1.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.8,2]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.9,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+
+            //*************
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            // DRAW STONE
+            // ###################################################### //
+
+            colorsBuffer = initBuffers(gl,positionsBox,darkGreyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2,0.7,-9]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.6,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.5,0.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,30 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[-1,0.5,-1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2.5,-0.3,1.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.3,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,-0.3,0.8]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,-0.6,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,0.7,-2]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,2,1.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.8,2]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.9,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+
+            //*************
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            // DRAW STONE
+            // ###################################################### //
+
+            colorsBuffer = initBuffers(gl,positionsBox,darkGreyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2,0.7,-9]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.3,0.9,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.5,0.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,30 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[-1,0.5,-1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2.5,-0.3,1.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.3,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,-0.3,0.8]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,-0.6,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,0.7,-2]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,2,1.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.8,2]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.9,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+
+            //*************
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            // DRAW STONE
+            // ###################################################### //
+
+            colorsBuffer = initBuffers(gl,positionsBox,darkGreyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[5,0.7,-9]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.8,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.5,0.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,30 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[-1,0.5,-1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2.5,-0.3,1.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.3,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,-0.3,0.8]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,-0.6,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,0.7,-2]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,2,1.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.8,2]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.9,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+
+            //*************
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            // DRAW STONE
+            // ###################################################### //
+
+            colorsBuffer = initBuffers(gl,positionsBox,darkGreyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[6,0.7,-9]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.2,0.3,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.5,0.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,30 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[-1,0.5,-1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2.5,-0.3,1.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.3,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,-0.3,0.8]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,-0.6,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,0.7,-2]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,2,1.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.8,2]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.9,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+
+            //*************
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            // DRAW STONE
+            // ###################################################### //
+
+            colorsBuffer = initBuffers(gl,positionsBox,darkGreyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[9,0.7,-9]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.6,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.5,0.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,30 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[-1,0.5,-1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2.5,-0.3,1.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.3,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,-0.3,0.8]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,-0.6,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,0.7,-2]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,2,1.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.8,2]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.9,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+
+            //*************
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            // DRAW STONE
+            // ###################################################### //
+
+            colorsBuffer = initBuffers(gl,positionsBox,darkGreyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-6,0.7,-9]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.4,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.5,0.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,30 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[-1,0.5,-1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2.5,-0.3,1.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.3,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,-0.3,0.8]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,-0.6,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,0.7,-2]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,1.5,1.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.8,2]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.9,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            //SEAWEED seaweedcolor
+            
+            colorsBuffer = initBuffers(gl,positionsBox,seaweedcolor);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-7,0.7,-7]);
+            let seaweedMatrix = mat4.clone(modelViewMatrix);
+            let seaweedMatrixB = mat4.clone(modelViewMatrix);
+            let seaweedMatrixC = mat4.clone(modelViewMatrix);
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,5* 0.0174533);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.10,0.8,0.3]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrix,seaweedMatrix,[0.3,1.5,0]);
+            let seaweed1Matrix = mat4.clone(seaweedMatrix);
+            mat4.rotateZ(seaweedMatrix,seaweedMatrix,-25 * 0.0174533);
+            mat4.rotateY(seaweedMatrix,seaweedMatrix,20* 0.0174533);
+            mat4.scale(seaweedMatrix,seaweedMatrix,[0.1,0.8,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1Matrix,seaweed1Matrix,[0.1,1.5,0]);
+            let seaweed2Matrix = mat4.clone(seaweed1Matrix);
+            mat4.rotateZ(seaweed1Matrix,seaweed1Matrix,20 * 0.0174533);
+            mat4.rotateY(seaweed1Matrix,seaweed1Matrix,-20* 0.0174533);
+            mat4.scale(seaweed1Matrix,seaweed1Matrix,[0.1,0.8,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2Matrix,seaweed2Matrix,[-0.45,1.3,-0.3]);
+            mat4.rotateZ(seaweed2Matrix,seaweed2Matrix,20 * 0.0174533);
+            mat4.rotateX(seaweed2Matrix,seaweed2Matrix,-20* 0.0174533);
+            mat4.rotateY(seaweed2Matrix,seaweed2Matrix,40* 0.0174533);
+            mat4.scale(seaweed2Matrix,seaweed2Matrix,[0.05,0.5,0.05]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixB,seaweedMatrixB,[-0.5,0,0.3]);
+            let seaweed1MatrixB = mat4.clone(seaweedMatrixB);
+            mat4.rotateZ(seaweedMatrixB,seaweedMatrixB,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixB,seaweedMatrixB,40* 0.0174533);
+            mat4.scale(seaweedMatrixB,seaweedMatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixB,seaweed1MatrixB,[-0.2,1,0.2]);
+            let seaweed2MatrixB = mat4.clone(seaweed1MatrixB);
+            mat4.rotateZ(seaweed1MatrixB,seaweed1MatrixB,25 * 0.0174533);
+            mat4.rotateX(seaweed1MatrixB,seaweed1MatrixB,20* 0.0174533);
+            mat4.rotateY(seaweed1MatrixB,seaweed1MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed1MatrixB,seaweed1MatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2MatrixB,seaweed2MatrixB,[-0.2,1,0]);
+            let seaweed3MatrixB = mat4.clone(seaweed2MatrixB);
+            mat4.rotateZ(seaweed2MatrixB,seaweed2MatrixB,1 * 0.0174533);
+            mat4.rotateX(seaweed2MatrixB,seaweed2MatrixB,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixB,seaweed2MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed2MatrixB,seaweed2MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed3MatrixB,seaweed3MatrixB,[-0.2,1,0.2]);
+            mat4.rotateZ(seaweed3MatrixB,seaweed3MatrixB,10 * 0.0174533);
+            mat4.rotateX(seaweed3MatrixB,seaweed3MatrixB,30* 0.0174533);
+            mat4.rotateY(seaweed3MatrixB,seaweed3MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed3MatrixB,seaweed3MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed3MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixC,seaweedMatrixC,[-0.5,-0.16,-0.3]);
+            let seaweed1MatrixC = mat4.clone(seaweedMatrixC);
+            mat4.rotateZ(seaweedMatrixC,seaweedMatrixC,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixC,seaweedMatrixC,130* 0.0174533);
+            mat4.scale(seaweedMatrixC,seaweedMatrixC,[0.05,0.5,0.15]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixC,seaweed1MatrixC,[0,1,0]);
+            let seaweed2MatrixC = mat4.clone(seaweed1MatrixC);
+            mat4.rotateZ(seaweed1MatrixC,seaweed1MatrixC,10* 0.0174533);
+            mat4.rotateY(seaweed1MatrixC,seaweed1MatrixC,40* 0.0174533);
+            mat4.scale(seaweed1MatrixC,seaweed1MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(seaweed2MatrixC,seaweed2MatrixC,[0.2,1,-0.2]);
+            mat4.rotateZ(seaweed2MatrixC,seaweed2MatrixC,-30* 0.0174533);
+            mat4.rotateX(seaweed2MatrixC,seaweed2MatrixC,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixC,seaweed2MatrixC,40* 0.0174533);
+            mat4.scale(seaweed2MatrixC,seaweed2MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+            
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            //SEAWEED 2 seaweedcolor
+            
+            colorsBuffer = initBuffers(gl,positionsBox,seaweedcolor);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-8,0.7,-5]);
+            seaweedMatrix = mat4.clone(modelViewMatrix);
+            seaweedMatrixB = mat4.clone(modelViewMatrix);
+            seaweedMatrixC = mat4.clone(modelViewMatrix);
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,5* 0.0174533);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.10,0.8,0.3]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrix,seaweedMatrix,[0.3,1.5,0]);
+            seaweed1Matrix = mat4.clone(seaweedMatrix);
+            mat4.rotateZ(seaweedMatrix,seaweedMatrix,-25 * 0.0174533);
+            mat4.rotateY(seaweedMatrix,seaweedMatrix,20* 0.0174533);
+            mat4.scale(seaweedMatrix,seaweedMatrix,[0.1,0.8,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1Matrix,seaweed1Matrix,[0.1,1.5,0]);
+            seaweed2Matrix = mat4.clone(seaweed1Matrix);
+            mat4.rotateZ(seaweed1Matrix,seaweed1Matrix,20 * 0.0174533);
+            mat4.rotateY(seaweed1Matrix,seaweed1Matrix,-20* 0.0174533);
+            mat4.scale(seaweed1Matrix,seaweed1Matrix,[0.1,0.8,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2Matrix,seaweed2Matrix,[-0.45,1.3,-0.3]);
+            mat4.rotateZ(seaweed2Matrix,seaweed2Matrix,20 * 0.0174533);
+            mat4.rotateX(seaweed2Matrix,seaweed2Matrix,-20* 0.0174533);
+            mat4.rotateY(seaweed2Matrix,seaweed2Matrix,40* 0.0174533);
+            mat4.scale(seaweed2Matrix,seaweed2Matrix,[0.05,0.5,0.05]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixB,seaweedMatrixB,[-0.5,0,0.3]);
+            seaweed1MatrixB = mat4.clone(seaweedMatrixB);
+            mat4.rotateZ(seaweedMatrixB,seaweedMatrixB,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixB,seaweedMatrixB,40* 0.0174533);
+            mat4.scale(seaweedMatrixB,seaweedMatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixB,seaweed1MatrixB,[-0.2,1,0.2]);
+            seaweed2MatrixB = mat4.clone(seaweed1MatrixB);
+            mat4.rotateZ(seaweed1MatrixB,seaweed1MatrixB,25 * 0.0174533);
+            mat4.rotateX(seaweed1MatrixB,seaweed1MatrixB,20* 0.0174533);
+            mat4.rotateY(seaweed1MatrixB,seaweed1MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed1MatrixB,seaweed1MatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2MatrixB,seaweed2MatrixB,[-0.2,1,0]);
+            seaweed3MatrixB = mat4.clone(seaweed2MatrixB);
+            mat4.rotateZ(seaweed2MatrixB,seaweed2MatrixB,1 * 0.0174533);
+            mat4.rotateX(seaweed2MatrixB,seaweed2MatrixB,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixB,seaweed2MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed2MatrixB,seaweed2MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed3MatrixB,seaweed3MatrixB,[-0.2,1,0.2]);
+            mat4.rotateZ(seaweed3MatrixB,seaweed3MatrixB,10 * 0.0174533);
+            mat4.rotateX(seaweed3MatrixB,seaweed3MatrixB,30* 0.0174533);
+            mat4.rotateY(seaweed3MatrixB,seaweed3MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed3MatrixB,seaweed3MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed3MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixC,seaweedMatrixC,[-0.5,-0.16,-0.3]);
+            seaweed1MatrixC = mat4.clone(seaweedMatrixC);
+            mat4.rotateZ(seaweedMatrixC,seaweedMatrixC,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixC,seaweedMatrixC,130* 0.0174533);
+            mat4.scale(seaweedMatrixC,seaweedMatrixC,[0.05,0.5,0.15]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixC,seaweed1MatrixC,[0,1,0]);
+            seaweed2MatrixC = mat4.clone(seaweed1MatrixC);
+            mat4.rotateZ(seaweed1MatrixC,seaweed1MatrixC,10* 0.0174533);
+            mat4.rotateY(seaweed1MatrixC,seaweed1MatrixC,40* 0.0174533);
+            mat4.scale(seaweed1MatrixC,seaweed1MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(seaweed2MatrixC,seaweed2MatrixC,[0.2,1,-0.2]);
+            mat4.rotateZ(seaweed2MatrixC,seaweed2MatrixC,-30* 0.0174533);
+            mat4.rotateX(seaweed2MatrixC,seaweed2MatrixC,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixC,seaweed2MatrixC,40* 0.0174533);
+            mat4.scale(seaweed2MatrixC,seaweed2MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+            
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            //SEAWEED 3 seaweedcolor
+            
+            colorsBuffer = initBuffers(gl,positionsBox,seaweedcolor);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[8,0.7,-6]);
+            seaweedMatrix = mat4.clone(modelViewMatrix);
+            seaweedMatrixB = mat4.clone(modelViewMatrix);
+            seaweedMatrixC = mat4.clone(modelViewMatrix);
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,5* 0.0174533);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.10,0.8,0.3]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrix,seaweedMatrix,[0.3,1.5,0]);
+            seaweed1Matrix = mat4.clone(seaweedMatrix);
+            mat4.rotateZ(seaweedMatrix,seaweedMatrix,-25 * 0.0174533);
+            mat4.rotateY(seaweedMatrix,seaweedMatrix,20* 0.0174533);
+            mat4.scale(seaweedMatrix,seaweedMatrix,[0.1,0.8,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1Matrix,seaweed1Matrix,[0.1,1.5,0]);
+            seaweed2Matrix = mat4.clone(seaweed1Matrix);
+            mat4.rotateZ(seaweed1Matrix,seaweed1Matrix,20 * 0.0174533);
+            mat4.rotateY(seaweed1Matrix,seaweed1Matrix,-20* 0.0174533);
+            mat4.scale(seaweed1Matrix,seaweed1Matrix,[0.1,0.8,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2Matrix,seaweed2Matrix,[-0.45,1.3,-0.3]);
+            mat4.rotateZ(seaweed2Matrix,seaweed2Matrix,20 * 0.0174533);
+            mat4.rotateX(seaweed2Matrix,seaweed2Matrix,-20* 0.0174533);
+            mat4.rotateY(seaweed2Matrix,seaweed2Matrix,40* 0.0174533);
+            mat4.scale(seaweed2Matrix,seaweed2Matrix,[0.05,0.5,0.05]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixB,seaweedMatrixB,[-0.5,0,0.3]);
+            seaweed1MatrixB = mat4.clone(seaweedMatrixB);
+            mat4.rotateZ(seaweedMatrixB,seaweedMatrixB,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixB,seaweedMatrixB,40* 0.0174533);
+            mat4.scale(seaweedMatrixB,seaweedMatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixB,seaweed1MatrixB,[-0.2,1,0.2]);
+            seaweed2MatrixB = mat4.clone(seaweed1MatrixB);
+            mat4.rotateZ(seaweed1MatrixB,seaweed1MatrixB,25 * 0.0174533);
+            mat4.rotateX(seaweed1MatrixB,seaweed1MatrixB,20* 0.0174533);
+            mat4.rotateY(seaweed1MatrixB,seaweed1MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed1MatrixB,seaweed1MatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2MatrixB,seaweed2MatrixB,[-0.2,1,0]);
+            seaweed3MatrixB = mat4.clone(seaweed2MatrixB);
+            mat4.rotateZ(seaweed2MatrixB,seaweed2MatrixB,1 * 0.0174533);
+            mat4.rotateX(seaweed2MatrixB,seaweed2MatrixB,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixB,seaweed2MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed2MatrixB,seaweed2MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed3MatrixB,seaweed3MatrixB,[-0.2,1,0.2]);
+            mat4.rotateZ(seaweed3MatrixB,seaweed3MatrixB,10 * 0.0174533);
+            mat4.rotateX(seaweed3MatrixB,seaweed3MatrixB,30* 0.0174533);
+            mat4.rotateY(seaweed3MatrixB,seaweed3MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed3MatrixB,seaweed3MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed3MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixC,seaweedMatrixC,[-0.5,-0.16,-0.3]);
+            seaweed1MatrixC = mat4.clone(seaweedMatrixC);
+            mat4.rotateZ(seaweedMatrixC,seaweedMatrixC,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixC,seaweedMatrixC,130* 0.0174533);
+            mat4.scale(seaweedMatrixC,seaweedMatrixC,[0.05,0.5,0.15]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixC,seaweed1MatrixC,[0,1,0]);
+            seaweed2MatrixC = mat4.clone(seaweed1MatrixC);
+            mat4.rotateZ(seaweed1MatrixC,seaweed1MatrixC,10* 0.0174533);
+            mat4.rotateY(seaweed1MatrixC,seaweed1MatrixC,40* 0.0174533);
+            mat4.scale(seaweed1MatrixC,seaweed1MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(seaweed2MatrixC,seaweed2MatrixC,[0.2,1,-0.2]);
+            mat4.rotateZ(seaweed2MatrixC,seaweed2MatrixC,-30* 0.0174533);
+            mat4.rotateX(seaweed2MatrixC,seaweed2MatrixC,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixC,seaweed2MatrixC,40* 0.0174533);
+            mat4.scale(seaweed2MatrixC,seaweed2MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+            
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            //SEAWEED  4 seaweedcolor
+            
+            colorsBuffer = initBuffers(gl,positionsBox,seaweedcolor);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-8,0.6,5]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.6,0.3]);
+            seaweedMatrix = mat4.clone(modelViewMatrix);
+            seaweedMatrixB = mat4.clone(modelViewMatrix);
+            seaweedMatrixC = mat4.clone(modelViewMatrix);
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,5* 0.0174533);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.10,0.8,0.3]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrix,seaweedMatrix,[0.3,1.5,0]);
+            seaweed1Matrix = mat4.clone(seaweedMatrix);
+            mat4.rotateZ(seaweedMatrix,seaweedMatrix,-25 * 0.0174533);
+            mat4.rotateY(seaweedMatrix,seaweedMatrix,20* 0.0174533);
+            mat4.scale(seaweedMatrix,seaweedMatrix,[0.1,0.8,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1Matrix,seaweed1Matrix,[0.1,1.5,0]);
+            seaweed2Matrix = mat4.clone(seaweed1Matrix);
+            mat4.rotateZ(seaweed1Matrix,seaweed1Matrix,20 * 0.0174533);
+            mat4.rotateY(seaweed1Matrix,seaweed1Matrix,-20* 0.0174533);
+            mat4.scale(seaweed1Matrix,seaweed1Matrix,[0.1,0.8,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2Matrix,seaweed2Matrix,[-0.45,1.3,-0.3]);
+            mat4.rotateZ(seaweed2Matrix,seaweed2Matrix,20 * 0.0174533);
+            mat4.rotateX(seaweed2Matrix,seaweed2Matrix,-20* 0.0174533);
+            mat4.rotateY(seaweed2Matrix,seaweed2Matrix,40* 0.0174533);
+            mat4.scale(seaweed2Matrix,seaweed2Matrix,[0.05,0.5,0.05]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixB,seaweedMatrixB,[-0.5,0,0.3]);
+            seaweed1MatrixB = mat4.clone(seaweedMatrixB);
+            mat4.rotateZ(seaweedMatrixB,seaweedMatrixB,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixB,seaweedMatrixB,40* 0.0174533);
+            mat4.scale(seaweedMatrixB,seaweedMatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixB,seaweed1MatrixB,[-0.2,1,0.2]);
+            seaweed2MatrixB = mat4.clone(seaweed1MatrixB);
+            mat4.rotateZ(seaweed1MatrixB,seaweed1MatrixB,25 * 0.0174533);
+            mat4.rotateX(seaweed1MatrixB,seaweed1MatrixB,20* 0.0174533);
+            mat4.rotateY(seaweed1MatrixB,seaweed1MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed1MatrixB,seaweed1MatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2MatrixB,seaweed2MatrixB,[-0.2,1,0]);
+            seaweed3MatrixB = mat4.clone(seaweed2MatrixB);
+            mat4.rotateZ(seaweed2MatrixB,seaweed2MatrixB,1 * 0.0174533);
+            mat4.rotateX(seaweed2MatrixB,seaweed2MatrixB,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixB,seaweed2MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed2MatrixB,seaweed2MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed3MatrixB,seaweed3MatrixB,[-0.2,1,0.2]);
+            mat4.rotateZ(seaweed3MatrixB,seaweed3MatrixB,10 * 0.0174533);
+            mat4.rotateX(seaweed3MatrixB,seaweed3MatrixB,30* 0.0174533);
+            mat4.rotateY(seaweed3MatrixB,seaweed3MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed3MatrixB,seaweed3MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed3MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixC,seaweedMatrixC,[-0.5,-0.16,-0.3]);
+            seaweed1MatrixC = mat4.clone(seaweedMatrixC);
+            mat4.rotateZ(seaweedMatrixC,seaweedMatrixC,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixC,seaweedMatrixC,130* 0.0174533);
+            mat4.scale(seaweedMatrixC,seaweedMatrixC,[0.05,0.5,0.15]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixC,seaweed1MatrixC,[0,1,0]);
+            seaweed2MatrixC = mat4.clone(seaweed1MatrixC);
+            mat4.rotateZ(seaweed1MatrixC,seaweed1MatrixC,10* 0.0174533);
+            mat4.rotateY(seaweed1MatrixC,seaweed1MatrixC,40* 0.0174533);
+            mat4.scale(seaweed1MatrixC,seaweed1MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(seaweed2MatrixC,seaweed2MatrixC,[0.2,1,-0.2]);
+            mat4.rotateZ(seaweed2MatrixC,seaweed2MatrixC,-30* 0.0174533);
+            mat4.rotateX(seaweed2MatrixC,seaweed2MatrixC,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixC,seaweed2MatrixC,40* 0.0174533);
+            mat4.scale(seaweed2MatrixC,seaweed2MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+            
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            //SEAWEED  4 seaweedcolor
+            
+            colorsBuffer = initBuffers(gl,positionsBox,seaweedcolor);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-8,0.6,5]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.6,0.3]);
+            seaweedMatrix = mat4.clone(modelViewMatrix);
+            seaweedMatrixB = mat4.clone(modelViewMatrix);
+            seaweedMatrixC = mat4.clone(modelViewMatrix);
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,5* 0.0174533);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.10,0.8,0.3]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrix,seaweedMatrix,[0.3,1.5,0]);
+            seaweed1Matrix = mat4.clone(seaweedMatrix);
+            mat4.rotateZ(seaweedMatrix,seaweedMatrix,-25 * 0.0174533);
+            mat4.rotateY(seaweedMatrix,seaweedMatrix,20* 0.0174533);
+            mat4.scale(seaweedMatrix,seaweedMatrix,[0.1,0.8,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1Matrix,seaweed1Matrix,[0.1,1.5,0]);
+            seaweed2Matrix = mat4.clone(seaweed1Matrix);
+            mat4.rotateZ(seaweed1Matrix,seaweed1Matrix,20 * 0.0174533);
+            mat4.rotateY(seaweed1Matrix,seaweed1Matrix,-20* 0.0174533);
+            mat4.scale(seaweed1Matrix,seaweed1Matrix,[0.1,0.8,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2Matrix,seaweed2Matrix,[-0.45,1.3,-0.3]);
+            mat4.rotateZ(seaweed2Matrix,seaweed2Matrix,20 * 0.0174533);
+            mat4.rotateX(seaweed2Matrix,seaweed2Matrix,-20* 0.0174533);
+            mat4.rotateY(seaweed2Matrix,seaweed2Matrix,40* 0.0174533);
+            mat4.scale(seaweed2Matrix,seaweed2Matrix,[0.05,0.5,0.05]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixB,seaweedMatrixB,[-0.5,0,0.3]);
+            seaweed1MatrixB = mat4.clone(seaweedMatrixB);
+            mat4.rotateZ(seaweedMatrixB,seaweedMatrixB,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixB,seaweedMatrixB,40* 0.0174533);
+            mat4.scale(seaweedMatrixB,seaweedMatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixB,seaweed1MatrixB,[-0.2,1,0.2]);
+            seaweed2MatrixB = mat4.clone(seaweed1MatrixB);
+            mat4.rotateZ(seaweed1MatrixB,seaweed1MatrixB,25 * 0.0174533);
+            mat4.rotateX(seaweed1MatrixB,seaweed1MatrixB,20* 0.0174533);
+            mat4.rotateY(seaweed1MatrixB,seaweed1MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed1MatrixB,seaweed1MatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2MatrixB,seaweed2MatrixB,[-0.2,1,0]);
+            seaweed3MatrixB = mat4.clone(seaweed2MatrixB);
+            mat4.rotateZ(seaweed2MatrixB,seaweed2MatrixB,1 * 0.0174533);
+            mat4.rotateX(seaweed2MatrixB,seaweed2MatrixB,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixB,seaweed2MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed2MatrixB,seaweed2MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed3MatrixB,seaweed3MatrixB,[-0.2,1,0.2]);
+            mat4.rotateZ(seaweed3MatrixB,seaweed3MatrixB,10 * 0.0174533);
+            mat4.rotateX(seaweed3MatrixB,seaweed3MatrixB,30* 0.0174533);
+            mat4.rotateY(seaweed3MatrixB,seaweed3MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed3MatrixB,seaweed3MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed3MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixC,seaweedMatrixC,[-0.5,-0.16,-0.3]);
+            seaweed1MatrixC = mat4.clone(seaweedMatrixC);
+            mat4.rotateZ(seaweedMatrixC,seaweedMatrixC,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixC,seaweedMatrixC,130* 0.0174533);
+            mat4.scale(seaweedMatrixC,seaweedMatrixC,[0.05,0.5,0.15]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixC,seaweed1MatrixC,[0,1,0]);
+            seaweed2MatrixC = mat4.clone(seaweed1MatrixC);
+            mat4.rotateZ(seaweed1MatrixC,seaweed1MatrixC,10* 0.0174533);
+            mat4.rotateY(seaweed1MatrixC,seaweed1MatrixC,40* 0.0174533);
+            mat4.scale(seaweed1MatrixC,seaweed1MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(seaweed2MatrixC,seaweed2MatrixC,[0.2,1,-0.2]);
+            mat4.rotateZ(seaweed2MatrixC,seaweed2MatrixC,-30* 0.0174533);
+            mat4.rotateX(seaweed2MatrixC,seaweed2MatrixC,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixC,seaweed2MatrixC,40* 0.0174533);
+            mat4.scale(seaweed2MatrixC,seaweed2MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+            
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            //SEAWEED  4 seaweedcolor
+            
+            colorsBuffer = initBuffers(gl,positionsBox,seaweedcolor);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-8,0.6,7]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.8,1,0.3]);
+            seaweedMatrix = mat4.clone(modelViewMatrix);
+            seaweedMatrixB = mat4.clone(modelViewMatrix);
+            seaweedMatrixC = mat4.clone(modelViewMatrix);
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,5* 0.0174533);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.10,0.8,0.3]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrix,seaweedMatrix,[0.3,1.5,0]);
+            seaweed1Matrix = mat4.clone(seaweedMatrix);
+            mat4.rotateZ(seaweedMatrix,seaweedMatrix,-25 * 0.0174533);
+            mat4.rotateY(seaweedMatrix,seaweedMatrix,20* 0.0174533);
+            mat4.scale(seaweedMatrix,seaweedMatrix,[0.1,0.8,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1Matrix,seaweed1Matrix,[0.1,1.5,0]);
+            seaweed2Matrix = mat4.clone(seaweed1Matrix);
+            mat4.rotateZ(seaweed1Matrix,seaweed1Matrix,20 * 0.0174533);
+            mat4.rotateY(seaweed1Matrix,seaweed1Matrix,-20* 0.0174533);
+            mat4.scale(seaweed1Matrix,seaweed1Matrix,[0.1,0.8,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2Matrix,seaweed2Matrix,[-0.45,1.3,-0.3]);
+            mat4.rotateZ(seaweed2Matrix,seaweed2Matrix,20 * 0.0174533);
+            mat4.rotateX(seaweed2Matrix,seaweed2Matrix,-20* 0.0174533);
+            mat4.rotateY(seaweed2Matrix,seaweed2Matrix,40* 0.0174533);
+            mat4.scale(seaweed2Matrix,seaweed2Matrix,[0.05,0.5,0.05]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixB,seaweedMatrixB,[-0.5,0,0.3]);
+            seaweed1MatrixB = mat4.clone(seaweedMatrixB);
+            mat4.rotateZ(seaweedMatrixB,seaweedMatrixB,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixB,seaweedMatrixB,40* 0.0174533);
+            mat4.scale(seaweedMatrixB,seaweedMatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixB,seaweed1MatrixB,[-0.2,1,0.2]);
+            seaweed2MatrixB = mat4.clone(seaweed1MatrixB);
+            mat4.rotateZ(seaweed1MatrixB,seaweed1MatrixB,25 * 0.0174533);
+            mat4.rotateX(seaweed1MatrixB,seaweed1MatrixB,20* 0.0174533);
+            mat4.rotateY(seaweed1MatrixB,seaweed1MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed1MatrixB,seaweed1MatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2MatrixB,seaweed2MatrixB,[-0.2,1,0]);
+            seaweed3MatrixB = mat4.clone(seaweed2MatrixB);
+            mat4.rotateZ(seaweed2MatrixB,seaweed2MatrixB,1 * 0.0174533);
+            mat4.rotateX(seaweed2MatrixB,seaweed2MatrixB,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixB,seaweed2MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed2MatrixB,seaweed2MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed3MatrixB,seaweed3MatrixB,[-0.2,1,0.2]);
+            mat4.rotateZ(seaweed3MatrixB,seaweed3MatrixB,10 * 0.0174533);
+            mat4.rotateX(seaweed3MatrixB,seaweed3MatrixB,30* 0.0174533);
+            mat4.rotateY(seaweed3MatrixB,seaweed3MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed3MatrixB,seaweed3MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed3MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixC,seaweedMatrixC,[-0.5,-0.16,-0.3]);
+            seaweed1MatrixC = mat4.clone(seaweedMatrixC);
+            mat4.rotateZ(seaweedMatrixC,seaweedMatrixC,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixC,seaweedMatrixC,130* 0.0174533);
+            mat4.scale(seaweedMatrixC,seaweedMatrixC,[0.05,0.5,0.15]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixC,seaweed1MatrixC,[0,1,0]);
+            seaweed2MatrixC = mat4.clone(seaweed1MatrixC);
+            mat4.rotateZ(seaweed1MatrixC,seaweed1MatrixC,10* 0.0174533);
+            mat4.rotateY(seaweed1MatrixC,seaweed1MatrixC,40* 0.0174533);
+            mat4.scale(seaweed1MatrixC,seaweed1MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(seaweed2MatrixC,seaweed2MatrixC,[0.2,1,-0.2]);
+            mat4.rotateZ(seaweed2MatrixC,seaweed2MatrixC,-30* 0.0174533);
+            mat4.rotateX(seaweed2MatrixC,seaweed2MatrixC,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixC,seaweed2MatrixC,40* 0.0174533);
+            mat4.scale(seaweed2MatrixC,seaweed2MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+
+            modelViewMatrix = mat4.create(); 
+            
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+             //SEAWEED  4 seaweedcolor
+            
+            colorsBuffer = initBuffers(gl,positionsBox,seaweedcolor);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-8,0.6,-6]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,0.8,0.6]);
+            seaweedMatrix = mat4.clone(modelViewMatrix);
+            seaweedMatrixB = mat4.clone(modelViewMatrix);
+            seaweedMatrixC = mat4.clone(modelViewMatrix);
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,5* 0.0174533);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.10,0.8,0.3]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrix,seaweedMatrix,[0.3,1.5,0]);
+            seaweed1Matrix = mat4.clone(seaweedMatrix);
+            mat4.rotateZ(seaweedMatrix,seaweedMatrix,-25 * 0.0174533);
+            mat4.rotateY(seaweedMatrix,seaweedMatrix,20* 0.0174533);
+            mat4.scale(seaweedMatrix,seaweedMatrix,[0.1,0.8,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1Matrix,seaweed1Matrix,[0.1,1.5,0]);
+            seaweed2Matrix = mat4.clone(seaweed1Matrix);
+            mat4.rotateZ(seaweed1Matrix,seaweed1Matrix,20 * 0.0174533);
+            mat4.rotateY(seaweed1Matrix,seaweed1Matrix,-20* 0.0174533);
+            mat4.scale(seaweed1Matrix,seaweed1Matrix,[0.1,0.8,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2Matrix,seaweed2Matrix,[-0.45,1.3,-0.3]);
+            mat4.rotateZ(seaweed2Matrix,seaweed2Matrix,20 * 0.0174533);
+            mat4.rotateX(seaweed2Matrix,seaweed2Matrix,-20* 0.0174533);
+            mat4.rotateY(seaweed2Matrix,seaweed2Matrix,40* 0.0174533);
+            mat4.scale(seaweed2Matrix,seaweed2Matrix,[0.05,0.5,0.05]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixB,seaweedMatrixB,[-0.5,0,0.3]);
+            seaweed1MatrixB = mat4.clone(seaweedMatrixB);
+            mat4.rotateZ(seaweedMatrixB,seaweedMatrixB,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixB,seaweedMatrixB,40* 0.0174533);
+            mat4.scale(seaweedMatrixB,seaweedMatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixB,seaweed1MatrixB,[-0.2,1,0.2]);
+            seaweed2MatrixB = mat4.clone(seaweed1MatrixB);
+            mat4.rotateZ(seaweed1MatrixB,seaweed1MatrixB,25 * 0.0174533);
+            mat4.rotateX(seaweed1MatrixB,seaweed1MatrixB,20* 0.0174533);
+            mat4.rotateY(seaweed1MatrixB,seaweed1MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed1MatrixB,seaweed1MatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2MatrixB,seaweed2MatrixB,[-0.2,1,0]);
+            seaweed3MatrixB = mat4.clone(seaweed2MatrixB);
+            mat4.rotateZ(seaweed2MatrixB,seaweed2MatrixB,1 * 0.0174533);
+            mat4.rotateX(seaweed2MatrixB,seaweed2MatrixB,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixB,seaweed2MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed2MatrixB,seaweed2MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed3MatrixB,seaweed3MatrixB,[-0.2,1,0.2]);
+            mat4.rotateZ(seaweed3MatrixB,seaweed3MatrixB,10 * 0.0174533);
+            mat4.rotateX(seaweed3MatrixB,seaweed3MatrixB,30* 0.0174533);
+            mat4.rotateY(seaweed3MatrixB,seaweed3MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed3MatrixB,seaweed3MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed3MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixC,seaweedMatrixC,[-0.5,-0.16,-0.3]);
+            seaweed1MatrixC = mat4.clone(seaweedMatrixC);
+            mat4.rotateZ(seaweedMatrixC,seaweedMatrixC,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixC,seaweedMatrixC,130* 0.0174533);
+            mat4.scale(seaweedMatrixC,seaweedMatrixC,[0.05,0.5,0.15]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixC,seaweed1MatrixC,[0,1,0]);
+            seaweed2MatrixC = mat4.clone(seaweed1MatrixC);
+            mat4.rotateZ(seaweed1MatrixC,seaweed1MatrixC,10* 0.0174533);
+            mat4.rotateY(seaweed1MatrixC,seaweed1MatrixC,40* 0.0174533);
+            mat4.scale(seaweed1MatrixC,seaweed1MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(seaweed2MatrixC,seaweed2MatrixC,[0.2,1,-0.2]);
+            mat4.rotateZ(seaweed2MatrixC,seaweed2MatrixC,-30* 0.0174533);
+            mat4.rotateX(seaweed2MatrixC,seaweed2MatrixC,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixC,seaweed2MatrixC,40* 0.0174533);
+            mat4.scale(seaweed2MatrixC,seaweed2MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+
+
+
+
+
+
+
+
             // ###################################################### //
 
             // Reset modelViewMatrix to draw another object
@@ -668,24 +1616,6 @@
             [0, 0.770, 0.770, 1.0],   
         ];
 
-        var pinkColors = [ 
-            [0.990, 0, 0.5, 1.0],    
-            [0.990, 0, 0.5, 1.0],    
-            [0.990, 0, 0.5, 1.0],    
-            [0.990, 0, 0.5, 1.0],    
-            [0.990, 0, 0.5, 1.0],    
-            [0.990, 0, 0.5, 1.0],    
-        ];
-
-        var lakeColors = [
-            [0.702, 0.929, 1, 1.0],
-            [0.702, 0.929, 1, 1.0],
-            [0.459, 0.871, 1, 1.0],
-            [0.702, 0.929, 1, 1.0],
-            [0.702, 0.929, 1, 1.0],
-            [0.702, 0.929, 1, 1.0],
-        ];
-
         var brownColors = [
             [0.62, 0.4, 0, 1.0],
             [0.62, 0.4, 0, 1.0],
@@ -693,42 +1623,6 @@
             [0.62, 0.4, 0, 1.0],
             [0.62, 0.4, 0, 1.0],
             [0.62, 0.4, 0, 1.0],
-        ];
-
-        var leafColors = [
-            [0.051, 1, 0, 1.0],
-            [0.051, 1, 0, 1.0],
-            [0.051, 1, 0, 1.0],
-            [0.051, 1, 0, 1.0],
-            [0.051, 1, 0, 1.0],
-            [0.051, 1, 0, 1.0],
-        ];
-
-        var orangeColors = [
-            [1, 0.812, 0, 1.0],
-            [1, 0.812, 0, 1.0],
-            [1, 0.812, 0, 1.0],
-            [1, 0.812, 0, 1.0],
-            [1, 0.812, 0, 1.0],
-            [1, 0.812, 0, 1.0],
-        ];
-
-        var blueColors = [
-            [0, 0, 1, 1.0],
-            [0, 0, 1, 1.0],
-            [0, 0, 1, 1.0],
-            [0, 0, 1, 1.0],
-            [0, 0, 1, 1.0],
-            [0, 0, 1, 1.0],
-        ];
-
-        var redColors = [
-            [1, 0, 0, 1.0],
-            [1, 0, 0, 1.0],
-            [1, 0, 0, 1.0],
-            [1, 0, 0, 1.0],
-            [1, 0, 0, 1.0],
-            [1, 0, 0, 1.0],
         ];
 
         var bluegreyColors = [
@@ -756,6 +1650,15 @@
             [0.063, 0.067, 0.078, 1.0],
             [0.063, 0.067, 0.078, 1.0],
             [0.063, 0.067, 0.078, 1.0],
+        ];
+
+        var seaweedcolor = [
+            [0.431, 0.6, 0.31, 1.0],
+            [0.431, 0.6, 0.31, 1.0],
+            [0.431, 0.6, 0.31, 1.0],
+            [0.431, 0.6, 0.31, 1.0],
+            [0.431, 0.6, 0.31, 1.0],
+            [0.431, 0.6, 0.31, 1.0],
         ];
 
         var rotateX = 0, rotateY = 0, rotateZ = 0;
