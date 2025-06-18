@@ -291,7 +291,7 @@
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             // DRAW bottom shell
-            colorsBuffer = initBuffers(gl,positionsBox,turtleGreenColour);
+            colorsBuffer = initBuffers(gl,positionsBox,shellColour);
             mat4.translate(TurtleMatrix,TurtleMatrix,[0,-0.2,0]);
             mat4.rotateY(TurtleMatrix,TurtleMatrix,90 * 0.0174533);  
             mat4.scale(TurtleMatrix,TurtleMatrix,[0.90,0.05,1]);
@@ -300,7 +300,7 @@
 
             //Draw top shell
             let topShellMatrix = mat4.clone(modelViewMatrix);
-            colorsBuffer = initBuffers(gl,positionsBox,turtleGreenColour);
+            colorsBuffer = initBuffers(gl,positionsBox,shellColour);
             mat4.translate(topShellMatrix,topShellMatrix,[0,1.5,0]);
             mat4.rotateY(topShellMatrix,topShellMatrix,90 * 0.0174533);  
             mat4.scale(topShellMatrix,topShellMatrix,[0.90,0.5,1]);
@@ -309,7 +309,7 @@
 
             //Draw turtle head
             let HeadMatrix =mat4.clone(modelViewMatrix);
-            colorsBuffer = initBuffers(gl,positionsBox,turtleGreenColour);
+            colorsBuffer = initBuffers(gl,positionsBox,shellColour);
             mat4.translate(HeadMatrix,HeadMatrix,[0,0,-0.5]);
             mat4.scale(HeadMatrix,HeadMatrix,[0.5,0.5,1]);
             drawScene(gl, programInfo, colorsBuffer, HeadMatrix, projectionMatrix);
@@ -2573,7 +2573,7 @@
         }
 
         //Setting for colourRGB (pong)
-        var turtleGreenColour = turtleColour, turtleColorBool = true;
+        var shellColour = turtleColour, turtleColorBool = true;
         function colorTurtle() { //colorParent2
             if (turtleColorBool == true) { turtleColorBool = false; } 
             else { turtleColorBool = true; }
@@ -2599,7 +2599,7 @@
             document.getElementById("aP2Label").innerHTML = parseFloat(alphaP2Value).toFixed(1);;
 
             if (turtleColorBool == true) {
-                turtleGreenColour = [ // turtleColors
+                shellColour = [ // turtleColors
                     [0.502, 1, 0.702, alphaP2Value],
                     [0.502, 1, 0.702, alphaP2Value],
                     [0.502, 1, 0.702, alphaP2Value],
@@ -2608,7 +2608,7 @@
                     [0.502, 1, 0.702, alphaP2Value],
                 ];
             } else {
-                turtleGreenColour = [ // StrawberryColors
+                shellColour = [ // StrawberryColors
                     [1, 0, 0.376, alphaP2Value],    
                     [1, 0, 0.376, alphaP2Value],   
                     [1, 0, 0.376, alphaP2Value],   
