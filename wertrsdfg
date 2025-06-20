@@ -1,0 +1,2983 @@
+<head>
+    <script src="gl-matrix-min.js"></script>
+    <script>
+        var modelViewMatrix = mat4.create();
+        function main() {
+            canvas = document.querySelector("#glCanvas");
+            canvas.addEventListener("mousedown", doMouseDown, false);
+            // Initialize the GL context
+            const gl = canvas.getContext("webgl");
+        
+            // Only continue if WebGL is available and working
+            if (gl === null) {
+                alert("Unable to initialize WebGL. Your browser or machine may not support it.");
+                return;
+            }
+        
+            // Vertex shader program
+            const vsSource = `
+                attribute vec4 aVertexPosition;
+                attribute vec3 aVertexNormal; // ** LIGHTING **
+                attribute vec4 aVertexColor;
+
+                uniform mat4 uNormalMatrix; // ** LIGHTING **
+                uniform mat4 uModelViewMatrix;
+                uniform mat4 uProjectionMatrix;
+
+                varying lowp vec4 vColor;
+                varying highp vec3 vLighting; // ** LIGHTING **
+
+                void main(void) {
+                    gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+                    vColor = aVertexColor;
+
+                    // Apply lighting effect // ** LIGHTING **
+
+                    highp vec3 ambientLight = vec3(0.15, 0.15, 0.15); // ambient light
+                    highp vec3 directionalLightColor = vec3(0.45, 0.45, 0.45); // light color // (1, 1, 1) is full white
+                    highp vec3 directionalVector = normalize(vec3(0.85, 0.4, 0.75));
+
+                    highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
+
+                    highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+                    vLighting = ambientLight + (directionalLightColor * directional);
+                    //vLighting = ambientLight;
+                    //vLighting = directionalLightColor * directional;
+                }
+            `;
+
+            //Transparentcy
+
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+
+            // Fragment shader program 
+            const fsSource = `
+                varying lowp vec4 vColor;
+                varying highp vec3 vLighting; // ** LIGHTING **
+
+                void main(void) {
+                    gl_FragColor = vec4(vColor.rgb * vLighting, vColor.a); // ** LIGHTING **
+                }
+            `;
+
+            // Initialize a shader program; this is where all the lighting
+            // for the vertices and so forth is established.
+            const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+
+            // Collect all the info needed to use the shader program.
+            // Look up which attribute our shader program is using
+            // for aVertexPosition and look up uniform locations.
+            const programInfo = {
+                program: shaderProgram,
+                attribLocations: {
+                    vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
+                    vertexNormal: gl.getAttribLocation(shaderProgram, 'aVertexNormal'), // ** LIGHTING **
+                    vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
+                },
+                uniformLocations: {
+                    projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
+                    modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+                    normalMatrix: gl.getUniformLocation(shaderProgram, 'uNormalMatrix'), // ** LIGHTING **
+                }
+            };
+
+            // coordinate to draw box
+            const positionsBox = [
+                // Front face
+                -1.0, -1.0,  1.0, // 0
+                1.0, -1.0,  1.0, // 1
+                1.0,  1.0,  1.0, // 2
+                -1.0,  1.0,  1.0, // 3
+
+                // Back face
+                -1.0, -1.0, -1.0, // 4
+                -1.0,  1.0, -1.0, // 5
+                1.0,  1.0, -1.0, // 6
+                1.0, -1.0, -1.0, // 7
+
+                // Top face
+                -1.0,  1.0, -1.0, // 8
+                -1.0,  1.0,  1.0, // 9
+                1.0,  1.0,  1.0, // 10
+                1.0,  1.0, -1.0, // 11
+
+                // Bottom face
+                -1.0, -1.0, -1.0, // 12
+                1.0, -1.0, -1.0, // 13
+                1.0, -1.0,  1.0, // 14
+                -1.0, -1.0,  1.0, // 15
+
+                // Right face
+                1.0, -1.0, -1.0, // 16
+                1.0,  1.0, -1.0, // 17
+                1.0,  1.0,  1.0, // 18
+                1.0, -1.0,  1.0, // 19
+
+                // Left face
+                -1.0, -1.0, -1.0, // 20
+                -1.0, -1.0,  1.0, // 21
+                -1.0,  1.0,  1.0, // 22
+                -1.0,  1.0, -1.0, // 23
+            ];
+
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
+            gl.clearDepth(1.0);                 // Clear everything
+            gl.enable(gl.DEPTH_TEST);           // Enable depth testing
+            gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
+
+            //const fieldOfView = 45 * Math.PI / 180;   // in radians
+            var fieldOfView = fieldOfViewC1 * 0.0174533;
+            const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+            const projectionMatrix = mat4.create();
+
+            // Put perspective matrix into "cameraMatrix" variable
+            var cameraMatrix = mat4.perspective(projectionMatrix,
+                                fieldOfView,
+                                aspect,
+                                zNear,
+                                zFar);
+               
+            // Translate and rotate camera                    
+            cameraMatrix = mat4.translate(cameraMatrix,cameraMatrix,[0, -1, -30]);   
+            cameraMatrix = mat4.rotateX(cameraMatrix,cameraMatrix,40 * 0.0174533);
+            cameraMatrix = mat4.translate(cameraMatrix,cameraMatrix,[0, 0, -zPosition]);   
+
+
+                                
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // Clear the canvas before we start drawing on it.
+
+            // modelViewMatrix declaration (make the drawing after this centered to 0,0,0 origin coordinate)
+            let modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            // DRAW BASE PLATE
+            // ###################################################### //
+            colorsBuffer = initBuffers(gl,positionsBox,OceanColors);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[10,0.1,10]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+
+            // Reset modelViewMatrix to draw another object
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+           
+            // ###################################################### //
+            //Draw spongebob house (pong JN)
+            // Reset modelViewMatrix to draw another object
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            colorsBuffer = initBuffers(gl,positionsBox,SpongebobHouseColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[6,2.2,8]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[2,2.1,2]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //window1
+            colorsBuffer = initBuffers(gl,positionsBox,greenColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[0.7,0.5,-0.05]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.2,0.3,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //window2
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-6.5,-1,-0.05]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,0.8,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //pipeapple leaf1
+            colorsBuffer = initBuffers(gl,positionsBox,pipeappleLeafColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[5,4,0.5]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,6,0.2]);
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,30 *0.0174533);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-1,0.5,0.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,30 *0.0174533);
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,180 *0.0174533);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-3,-0.,1]);
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,75 *0.0174533);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //###############################################################
+            // Reset modelViewMatrix to draw another object (door have error)
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ);
+            
+            //draw door
+            colorsBuffer = initBuffers(gl,positionsBox,doorBlueColour);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[6.2,1,6]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.6,1,0.05]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //###############################################################
+            // Reset modelViewMatrix to draw another object (for Exhaust pipe)
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ);
+            //Draw Exhaust pipe
+            colorsBuffer = initBuffers(gl,positionsBox,doorBlueColour);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[3.5,3,8.3]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.2,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-0.5,3,0]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,3,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Reset modelViewMatrix to draw another object 
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ);
+
+            //Draw Exhaust pipe
+            colorsBuffer = initBuffers(gl,positionsBox,pipeBlueColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[3.2,4.2,8.3]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.2,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            colorsBuffer = initBuffers(gl,positionsBox,pipePortColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[0,1,0]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.2,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            //##########################################################//
+
+            // ###################################################### //
+            //Draw turtle - (PONG JN)
+            // Reset modelViewMatrix to draw another object
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+             //Draw middle shell (main)
+            colorsBuffer = initBuffers(gl,positionsBox,greyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[TurtleMoveX,4,TurtleMoveZ]); //coordinate
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,TurtleRotateY * 0.0174533);  
+            let TurtleMatrix =mat4.clone(modelViewMatrix);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,0.2,1]); //size
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // DRAW bottom shell
+            colorsBuffer = initBuffers(gl,positionsBox,shellColour);
+            mat4.translate(TurtleMatrix,TurtleMatrix,[0,-0.2,0]);
+            mat4.rotateY(TurtleMatrix,TurtleMatrix,90 * 0.0174533);  
+            mat4.scale(TurtleMatrix,TurtleMatrix,[0.90,0.05,1]);
+            drawScene(gl, programInfo, colorsBuffer, TurtleMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw top shell
+            let topShellMatrix = mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,shellColour);
+            mat4.translate(topShellMatrix,topShellMatrix,[0,1.5,0]);
+            mat4.rotateY(topShellMatrix,topShellMatrix,90 * 0.0174533);  
+            mat4.scale(topShellMatrix,topShellMatrix,[0.90,0.5,1]);
+            drawScene(gl, programInfo, colorsBuffer, topShellMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw turtle head
+            let HeadMatrix =mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,shellColour);
+            mat4.translate(HeadMatrix,HeadMatrix,[0,0,-0.5]);
+            mat4.scale(HeadMatrix,HeadMatrix,[0.5,0.5,1]);
+            drawScene(gl, programInfo, colorsBuffer, HeadMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw turtle left leg
+            let leftLegMatrix = mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,handColor)
+            mat4.translate(leftLegMatrix,leftLegMatrix,[-0.5,0,0.5]);
+            mat4.scale(leftLegMatrix,leftLegMatrix,[0.2,0.5,1]);
+            drawScene(gl, programInfo, colorsBuffer, leftLegMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw turtle right leg
+            let rightLegMatrix = mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,handColor)
+            mat4.translate(rightLegMatrix,rightLegMatrix,[-0.5,0,0.5]);
+            mat4.scale(rightLegMatrix,rightLegMatrix,[0.2,0.5,1]);
+            drawScene(gl, programInfo, colorsBuffer, rightLegMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw turtle left leg
+            let legMatrix = mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,handColor);
+            mat4.translate(legMatrix,legMatrix,[0.5,0,0.5]);
+            mat4.scale(legMatrix,legMatrix,[0.2,0.5,1]);
+            drawScene(gl, programInfo, colorsBuffer, legMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw  RIGHT hand bone
+            let handBoneMatrix =mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,handColor);
+            mat4.translate(handBoneMatrix,handBoneMatrix,[1.2,0,-0.5]);
+            mat4.scale(handBoneMatrix,handBoneMatrix,[0.5,0.5,0.2]);
+            mat4.rotateY(handBoneMatrix,handBoneMatrix, HandMove); 
+            drawScene(gl, programInfo, colorsBuffer, handBoneMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw right hand
+            colorsBuffer = initBuffers(gl,positionsBox,handColor);
+            mat4.translate(handBoneMatrix,handBoneMatrix,[1.3,0.8,0]);
+            mat4.rotateY(handBoneMatrix,handBoneMatrix,45* 0.0174533);
+            drawScene(gl, programInfo, colorsBuffer, handBoneMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //DRAW LEFT HAND bone
+            let leftBoneMatrix =mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,handColor);
+            mat4.translate(leftBoneMatrix,leftBoneMatrix,[-1.2,0,-0.5]);
+            mat4.scale(leftBoneMatrix,leftBoneMatrix,[0.5,0.5,0.2]);
+            mat4.rotateY(leftBoneMatrix,leftBoneMatrix, -HandMove); 
+            drawScene(gl, programInfo, colorsBuffer, leftBoneMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //DRAW left hand
+            colorsBuffer = initBuffers(gl,positionsBox,handColor);
+            mat4.translate(leftBoneMatrix,leftBoneMatrix,[-1.1,0,-0.5]);
+            mat4.rotateY(leftBoneMatrix,leftBoneMatrix,45* 0.0174533);
+            drawScene(gl, programInfo, colorsBuffer, leftBoneMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //############end for pong's turtle ##################
+  
+            // ###################################################### //
+            // Draw jellyfish (Wong Jia Ying)
+
+            // Reset modelViewMatrix to draw another object
+            mat4.identity(modelViewMatrix);
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix, modelViewMatrix, rotateX);
+            mat4.rotateY(modelViewMatrix, modelViewMatrix, rotateY);
+            mat4.rotateZ(modelViewMatrix, modelViewMatrix, rotateZ);
+
+            //Draw middle jellyfish bell(main)
+            colorsBuffer = initBuffers(gl, positionsBox, JellyFishBodyColour); // Use dynamic JellyFishBodyColour
+            mat4.translate(modelViewMatrix, modelViewMatrix, [JellyFishMoveX, JellyFishMoveY, JellyFishMoveZ]); //Overall Jellyfish coordinate
+            mat4.scale(modelViewMatrix, modelViewMatrix, [JellyFishOverallScale, JellyFishOverallScale, JellyFishOverallScale]); //Overall Jellyfish scale
+            mat4.rotateY(modelViewMatrix, modelViewMatrix, JellyFishRotateY * 0.0174533);
+let JellyFishMainMatrix = mat4.clone(modelViewMatrix); // Base for all parts relative to the jellyfish's position/rotation
+mat4.scale(modelViewMatrix, modelViewMatrix, [1.5 * JellyFishPulseScale, 1.0 * JellyFishPulseScale, 1.5 * JellyFishPulseScale]); //size
+drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+// Draw Bottom of jellyfish Bell
+colorsBuffer = initBuffers(gl, positionsBox, JellyFishBodyColour); // Use the variable for dynamic color
+let JellyFishBottomMatrix = mat4.clone(JellyFishMainMatrix); // Start from main jellyfish's base
+mat4.translate(JellyFishBottomMatrix, JellyFishBottomMatrix, [0, -1.0 * JellyFishPulseScale, 0]); // Move down relative to the main bell
+mat4.scale(JellyFishBottomMatrix, JellyFishBottomMatrix, [1.2 * JellyFishPulseScale, 0.3 * JellyFishPulseScale, 1.2 * JellyFishPulseScale]); // Wider, flatter bottom
+drawScene(gl, programInfo, colorsBuffer, JellyFishBottomMatrix, projectionMatrix);
+gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+// Draw Top of jellyfish Bell
+colorsBuffer = initBuffers(gl, positionsBox, JellyFishBodyColour); // Use the variable for dynamic color
+let JellyFishTopMatrix = mat4.clone(JellyFishMainMatrix); // Start from main jellyfish's base
+mat4.translate(JellyFishTopMatrix, JellyFishTopMatrix, [0, 1.0 * JellyFishPulseScale, 0]); // Move up relative to the main bell
+mat4.scale(JellyFishTopMatrix, JellyFishTopMatrix, [0.8 * JellyFishPulseScale, 0.5 * JellyFishPulseScale, 0.8 * JellyFishPulseScale]); // Smaller, flatter top
+drawScene(gl, programInfo, colorsBuffer, JellyFishTopMatrix, projectionMatrix);
+gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+// Draw central oral arms
+let OralArmMatrix = mat4.clone(JellyFishMainMatrix);
+colorsBuffer = initBuffers(gl, positionsBox, JellyFishTentacleColour); // Use the variable for dynamic color
+mat4.translate(OralArmMatrix, OralArmMatrix, [0, -1.5 * JellyFishPulseScale, 0]); // Position below the bell
+mat4.scale(OralArmMatrix, OralArmMatrix, [0.5 * JellyFishPulseScale, 2.0 * JellyFishPulseScale, 0.5 * JellyFishPulseScale]); // Stretched vertically
+drawScene(gl, programInfo, colorsBuffer, OralArmMatrix, projectionMatrix);
+gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+//Draw tentacles
+// Tentacle 1 (Front Left)
+let Tentacle1Matrix = mat4.clone(JellyFishMainMatrix);
+colorsBuffer = initBuffers(gl, positionsBox, JellyFishTentacleColour); // Use the variable for dynamic color
+mat4.translate(Tentacle1Matrix, Tentacle1Matrix, [-0.8 * JellyFishPulseScale, -1.8 * JellyFishPulseScale, 0.8 * JellyFishPulseScale]); // Position below bell, offset
+mat4.rotateY(Tentacle1Matrix, Tentacle1Matrix, JellyFishTentacleMove); // Animation for sway
+mat4.scale(Tentacle1Matrix, Tentacle1Matrix, [0.2 * JellyFishPulseScale, 3.0 * JellyFishPulseScale, 0.2 * JellyFishPulseScale]); // Thin and long
+drawScene(gl, programInfo, colorsBuffer, Tentacle1Matrix, projectionMatrix);
+gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+// Tentacle 2 (Front Right)
+let Tentacle2Matrix = mat4.clone(JellyFishMainMatrix);
+colorsBuffer = initBuffers(gl, positionsBox, JellyFishTentacleColour); // Use the variable for dynamic color
+mat4.translate(Tentacle2Matrix, Tentacle2Matrix, [0.8 * JellyFishPulseScale, -1.8 * JellyFishPulseScale, 0.8 * JellyFishPulseScale]); // Position below bell, offset
+mat4.rotateY(Tentacle2Matrix, Tentacle2Matrix, JellyFishTentacleMove); // Animation for sway (kept consistent for symmetry)
+mat4.scale(Tentacle2Matrix, Tentacle2Matrix, [0.2 * JellyFishPulseScale, 3.0 * JellyFishPulseScale, 0.2 * JellyFishPulseScale]); // Thin and long
+drawScene(gl, programInfo, colorsBuffer, Tentacle2Matrix, projectionMatrix);
+gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+// Tentacle 3 (Back Left)
+let Tentacle3Matrix = mat4.clone(JellyFishMainMatrix);
+colorsBuffer = initBuffers(gl, positionsBox, JellyFishTentacleColour); // Use the variable for dynamic color
+mat4.translate(Tentacle3Matrix, Tentacle3Matrix, [-0.8 * JellyFishPulseScale, -1.8 * JellyFishPulseScale, -0.8 * JellyFishPulseScale]); // Position below bell, offset
+mat4.rotateY(Tentacle3Matrix, Tentacle3Matrix, JellyFishTentacleMove); // Animation for sway (kept consistent for symmetry)
+mat4.scale(Tentacle3Matrix, Tentacle3Matrix, [0.2 * JellyFishPulseScale, 3.0 * JellyFishPulseScale, 0.2 * JellyFishPulseScale]); // Thin and long
+drawScene(gl, programInfo, colorsBuffer, Tentacle3Matrix, projectionMatrix);
+gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+//Tentacle 4 (Back Right)
+let Tentacle4Matrix = mat4.clone(JellyFishMainMatrix);
+colorsBuffer = initBuffers(gl, positionsBox, JellyFishTentacleColour); // Use the variable for dynamic color
+mat4.translate(Tentacle4Matrix, Tentacle4Matrix, [0.8 * JellyFishPulseScale, -1.8 * JellyFishPulseScale, -0.8 * JellyFishPulseScale]); // Position below bell, offset
+mat4.rotateY(Tentacle4Matrix, Tentacle4Matrix, JellyFishTentacleMove); // Animation for sway (kept consistent for symmetry)
+mat4.scale(Tentacle4Matrix, Tentacle4Matrix, [0.2 * JellyFishPulseScale, 3.0 * JellyFishPulseScale, 0.2 * JellyFishPulseScale]); // Thin and long
+drawScene(gl, programInfo, colorsBuffer, Tentacle4Matrix, projectionMatrix);
+gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+//############ end for jellyfish (Wong Jia Ying) ################# //
+
+           
+            // ###################################################### //
+            // Draw Fish Group - (wong jia ying)
+
+            // Reset modelViewMatrix to draw another object
+            modelViewMatrix = mat4.create();
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix, modelViewMatrix, rotateX);
+            mat4.rotateY(modelViewMatrix, modelViewMatrix, rotateY);
+            mat4.rotateZ(modelViewMatrix, modelViewMatrix, rotateZ);
+
+            // Create a base matrix for the entire fish group
+            let fishGroupBaseMatrix = mat4.clone(modelViewMatrix);
+            mat4.translate(fishGroupBaseMatrix, fishGroupBaseMatrix, [GroupMoveX, -2, GroupMoveZ]); //  group movement
+            mat4.rotateY(fishGroupBaseMatrix, fishGroupBaseMatrix, GroupRotateY * 0.0174533); //  group rotation
+
+            // --- Fish 1 ---
+            // Fish 1 Body (parent)
+            colorsBuffer = initBuffers(gl, positionsBox, fishBodyColour); // Use the variable for dynamic color
+            let fish1BodyMatrix = mat4.clone(fishGroupBaseMatrix); // Start from the group's base matrix
+            mat4.translate(fish1BodyMatrix, fish1BodyMatrix, [Fish1OffsetX, 3, Fish1OffsetZ]); // Individual offset from group center
+            mat4.scale(fish1BodyMatrix, fish1BodyMatrix, [0.5 * FishOverallScale, 0.3 * FishOverallScale, 0.8 * FishOverallScale]); // Body size
+            drawScene(gl, programInfo, colorsBuffer, fish1BodyMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Fish 1 Tail (child of Fish 1 Body)
+            let fish1TailMatrix = mat4.clone(fish1BodyMatrix); // Clone body matrix
+            mat4.translate(fish1TailMatrix, fish1TailMatrix, [0, 0, -1.0]); // Position behind the body
+            mat4.rotateY(fish1TailMatrix, fish1TailMatrix, TailWagMove); // Apply tail wag animation
+            mat4.scale(fish1TailMatrix, fish1TailMatrix, [0.1, 0.7, 0.5]); // Tail size (thin and flat)
+            drawScene(gl, programInfo, colorsBuffer, fish1TailMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+
+            // --- Fish 2 ---
+            // Fish 2 Body (parent)
+            let fish2BodyMatrix = mat4.clone(fishGroupBaseMatrix);
+            mat4.translate(fish2BodyMatrix, fish2BodyMatrix, [Fish2OffsetX, 2.5, Fish2OffsetZ]);
+            mat4.scale(fish2BodyMatrix, fish2BodyMatrix, [0.4 * FishOverallScale, 0.25 * FishOverallScale, 0.7 * FishOverallScale]);
+            drawScene(gl, programInfo, colorsBuffer, fish2BodyMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Fish 2 Tail (child of Fish 2 Body)
+            let fish2TailMatrix = mat4.clone(fish2BodyMatrix);
+            mat4.translate(fish2TailMatrix, fish2TailMatrix, [0, 0, -1.0]);
+            mat4.rotateY(fish2TailMatrix, fish2TailMatrix, -TailWagMove); // Opposite wag for variety
+            mat4.scale(fish2TailMatrix, fish2TailMatrix, [0.1, 0.7, 0.5]);
+            drawScene(gl, programInfo, colorsBuffer, fish2TailMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+
+            // --- Fish 3 ---
+            // Fish 3 Body (parent)
+            let fish3BodyMatrix = mat4.clone(fishGroupBaseMatrix);
+            mat4.translate(fish3BodyMatrix, fish3BodyMatrix, [Fish3OffsetX, 4, Fish3OffsetZ]);
+            mat4.scale(fish3BodyMatrix, fish3BodyMatrix, [0.7 * FishOverallScale, 0.4 * FishOverallScale, 1.0 * FishOverallScale]);
+            drawScene(gl, programInfo, colorsBuffer, fish3BodyMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Fish 3 Tail (child of Fish 3 Body)
+            let fish3TailMatrix = mat4.clone(fish3BodyMatrix);
+            mat4.translate(fish3TailMatrix, fish3TailMatrix, [0, 0, -1.0]);
+            mat4.rotateY(fish3TailMatrix, fish3TailMatrix, TailWagMove);
+            mat4.scale(fish3TailMatrix, fish3TailMatrix, [0.1, 0.7, 0.5]);
+            drawScene(gl, programInfo, colorsBuffer, fish3TailMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+
+            // --- Fish 4 ---
+            // Fish 4 Body (parent)
+            let fish4BodyMatrix = mat4.clone(fishGroupBaseMatrix);
+            mat4.translate(fish4BodyMatrix, fish4BodyMatrix, [Fish4OffsetX, 3.5, Fish4OffsetZ]);
+            mat4.scale(fish4BodyMatrix, fish4BodyMatrix, [0.8 * FishOverallScale, 0.35 * FishOverallScale, 0.7 * FishOverallScale]);
+            drawScene(gl, programInfo, colorsBuffer, fish4BodyMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Fish 4 Tail (child of Fish 4 Body)
+            let fish4TailMatrix = mat4.clone(fish4BodyMatrix);
+            mat4.translate(fish4TailMatrix, fish4TailMatrix, [0, 0, -1.0]);
+            mat4.rotateY(fish4TailMatrix, fish4TailMatrix, -TailWagMove);
+            mat4.scale(fish4TailMatrix, fish4TailMatrix, [0.1, 0.7, 0.5]);
+            drawScene(gl, programInfo, colorsBuffer, fish4TailMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //############ end for Fish Group (Wong jia ying) ##################
+
+
+            // ###################################################### //
+            // Draw Seahorse -(TIFFANY)
+            var seahorseHeadMatrix = mat4.create(); 
+
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(seahorseHeadMatrix, seahorseHeadMatrix, rotateX);
+            mat4.rotateY(seahorseHeadMatrix, seahorseHeadMatrix, rotateY);
+            mat4.rotateZ(seahorseHeadMatrix, seahorseHeadMatrix, rotateZ);
+
+            //Draw head (main)
+            colorsBuffer = initBuffers(gl, positionsBox, seahorseHeadColour);
+            mat4.translate(seahorseHeadMatrix, seahorseHeadMatrix, [seahorseHeadX, seahorseHeadY, seahorseHeadZ]); //coordinate
+            mat4.scale(seahorseHeadMatrix, seahorseHeadMatrix, [0.4, 0.4, 0.4]); //size
+            drawScene(gl, programInfo, colorsBuffer, seahorseHeadMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+
+            // Draw NOSE (Child of Head)
+            colorsBuffer = initBuffers(gl, positionsBox, seahorseBodyColour);
+            let seahorseNoseMatrix = mat4.clone(seahorseHeadMatrix);
+            mat4.translate(seahorseNoseMatrix, seahorseNoseMatrix, [0, 0.1, -0.6]); 
+            mat4.scale(seahorseNoseMatrix, seahorseNoseMatrix, [0.15, 0.1, 0.8]);
+            drawScene(gl, programInfo, colorsBuffer, seahorseNoseMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Draw BODY (Child of Head)
+            colorsBuffer = initBuffers(gl, positionsBox, seahorseBodyColour); 
+            let seahorseBodyMatrix = mat4.clone(seahorseHeadMatrix);
+            mat4.translate(seahorseBodyMatrix, seahorseBodyMatrix, [0, -1.0, 0]); 
+            mat4.scale(seahorseBodyMatrix, seahorseBodyMatrix, [0.6, 2.0, 0.6]); 
+            drawScene(gl, programInfo, colorsBuffer, seahorseBodyMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+
+            // Draw TAIL Segment 1 (Child of Body)
+            colorsBuffer = initBuffers(gl, positionsBox, seahorseTailColour); 
+            let seahorseTail1Matrix = mat4.clone(seahorseBodyMatrix);
+            mat4.translate(seahorseTail1Matrix, seahorseTail1Matrix, [0, -1.2, 0]); 
+            mat4.scale(seahorseTail1Matrix, seahorseTail1Matrix, [0.6, 0.7, 0.6]); 
+            drawScene(gl, programInfo, colorsBuffer, seahorseTail1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Draw TAIL Segment 2 (Child of Tail Segment 1, Animates)
+            colorsBuffer = initBuffers(gl, positionsBox, seahorseHeadColour); 
+            let seahorseTail2Matrix = mat4.clone(seahorseTail1Matrix);
+            mat4.translate(seahorseTail2Matrix, seahorseTail2Matrix, [0, -0.5, 0]); 
+            mat4.rotateX(seahorseTail2Matrix, seahorseTail2Matrix, seahorseTail2Rotate); 
+            mat4.scale(seahorseTail2Matrix, seahorseTail2Matrix, [0.7, 1.5, 0.7]);
+            drawScene(gl, programInfo, colorsBuffer, seahorseTail2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Draw TAIL Segment 3 (Child of Tail Segment 2, Animates)
+            colorsBuffer = initBuffers(gl, positionsBox, seahorseTailColour); 
+            let seahorseTail3Matrix = mat4.clone(seahorseTail2Matrix);
+            mat4.translate(seahorseTail3Matrix, seahorseTail3Matrix, [0, -0.5, 0]); 
+            mat4.rotateX(seahorseTail3Matrix, seahorseTail3Matrix, seahorseTail3Rotate);
+            mat4.scale(seahorseTail3Matrix, seahorseTail3Matrix, [0.6, 1.5, 0.6]); 
+            drawScene(gl, programInfo, colorsBuffer, seahorseTail3Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Draw FIN 1 (Child of Head, Animates)
+            colorsBuffer = initBuffers(gl, positionsBox, seahorsePinkColor); // Using a specific fin color
+            let seahorseFin1Matrix = mat4.clone(seahorseHeadMatrix);
+            mat4.translate(seahorseFin1Matrix, seahorseFin1Matrix, [-0.5 + seahorseFin1OffsetX, 0, 1.2]);
+            mat4.scale(seahorseFin1Matrix, seahorseFin1Matrix, [0.1, 1, 0.5]);
+            drawScene(gl, programInfo, colorsBuffer, seahorseFin1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Draw FIN 2 (Child of Head, Animates)
+            colorsBuffer = initBuffers(gl, positionsBox, seahorsePinkColor); // Using a specific fin color
+            let seahorseFin2Matrix = mat4.clone(seahorseHeadMatrix);
+            mat4.translate(seahorseFin2Matrix, seahorseFin2Matrix, [0.5 + seahorseFin2OffsetX, 0, 1.2]);
+            mat4.scale(seahorseFin2Matrix, seahorseFin2Matrix, [0.1, 1, 0.5]);
+            drawScene(gl, programInfo, colorsBuffer, seahorseFin2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            //############ end for seahorse (tiffany)) ##################
+
+
+            // ###################################################### //
+            // STONE & SEAWEED (Chin Jia Yin)
+            // ###################################################### //
+            
+            // Reset modelViewMatrix to draw another object
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ);
+            // DRAW STONE
+            // ###################################################### //
+
+            colorsBuffer = initBuffers(gl,positionsBox,darkGreyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-5,0.7,-9]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.6,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.5,0.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,30 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[-1,0.5,-1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2.5,-0.3,1.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.3,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,-0.3,0.8]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,-0.6,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,0.7,-2]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,2,1.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.8,2]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.9,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            // DRAW STONE
+            // ###################################################### //
+
+            colorsBuffer = initBuffers(gl,positionsBox,darkGreyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2,0.7,-9]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.6,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.5,0.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,30 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[-1,0.5,-1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2.5,-0.3,1.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.3,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,-0.3,0.8]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,-0.6,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,0.7,-2]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,2,1.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.8,2]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.9,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+
+            //*************
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            // DRAW STONE
+            // ###################################################### //
+
+            colorsBuffer = initBuffers(gl,positionsBox,darkGreyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[9,0.7,-9]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.6,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.5,0.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,30 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[-1,0.5,-1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[2.5,-0.3,1.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.3,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,-0.3,0.8]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,-0.6,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1.7,0.7,-2]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,10 * 0.0174533);  
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,2,1.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(modelViewMatrix,modelViewMatrix,[1,-0.8,2]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,1.9,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            //SEAWEED seaweedcolor
+            
+            colorsBuffer = initBuffers(gl,positionsBox,seaweedcolor);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-7,0.7,-7]);
+            let seaweedMatrix = mat4.clone(modelViewMatrix);
+            let seaweedMatrixB = mat4.clone(modelViewMatrix);
+            let seaweedMatrixC = mat4.clone(modelViewMatrix);
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,5* 0.0174533);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.10,0.8,0.3]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrix,seaweedMatrix,[0.3,1.5,0]);
+            let seaweed1Matrix = mat4.clone(seaweedMatrix);
+            mat4.rotateZ(seaweedMatrix,seaweedMatrix,-25 * 0.0174533);
+            mat4.rotateY(seaweedMatrix,seaweedMatrix,20* 0.0174533);
+            mat4.scale(seaweedMatrix,seaweedMatrix,[0.1,0.8,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1Matrix,seaweed1Matrix,[0.1,1.5,0]);
+            let seaweed2Matrix = mat4.clone(seaweed1Matrix);
+            mat4.rotateZ(seaweed1Matrix,seaweed1Matrix,20 * 0.0174533);
+            mat4.rotateY(seaweed1Matrix,seaweed1Matrix,-20* 0.0174533);
+            mat4.scale(seaweed1Matrix,seaweed1Matrix,[0.1,0.8,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2Matrix,seaweed2Matrix,[-0.45,1.3,-0.3]);
+            mat4.rotateZ(seaweed2Matrix,seaweed2Matrix,20 * 0.0174533);
+            mat4.rotateX(seaweed2Matrix,seaweed2Matrix,-20* 0.0174533);
+            mat4.rotateY(seaweed2Matrix,seaweed2Matrix,40* 0.0174533);
+            mat4.scale(seaweed2Matrix,seaweed2Matrix,[0.05,0.5,0.05]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixB,seaweedMatrixB,[-0.5,0,0.3]);
+            let seaweed1MatrixB = mat4.clone(seaweedMatrixB);
+            mat4.rotateZ(seaweedMatrixB,seaweedMatrixB,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixB,seaweedMatrixB,40* 0.0174533);
+            mat4.scale(seaweedMatrixB,seaweedMatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixB,seaweed1MatrixB,[-0.2,1,0.2]);
+            let seaweed2MatrixB = mat4.clone(seaweed1MatrixB);
+            mat4.rotateZ(seaweed1MatrixB,seaweed1MatrixB,25 * 0.0174533);
+            mat4.rotateX(seaweed1MatrixB,seaweed1MatrixB,20* 0.0174533);
+            mat4.rotateY(seaweed1MatrixB,seaweed1MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed1MatrixB,seaweed1MatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2MatrixB,seaweed2MatrixB,[-0.2,1,0]);
+            let seaweed3MatrixB = mat4.clone(seaweed2MatrixB);
+            mat4.rotateZ(seaweed2MatrixB,seaweed2MatrixB,1 * 0.0174533);
+            mat4.rotateX(seaweed2MatrixB,seaweed2MatrixB,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixB,seaweed2MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed2MatrixB,seaweed2MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed3MatrixB,seaweed3MatrixB,[-0.2,1,0.2]);
+            mat4.rotateZ(seaweed3MatrixB,seaweed3MatrixB,10 * 0.0174533);
+            mat4.rotateX(seaweed3MatrixB,seaweed3MatrixB,30* 0.0174533);
+            mat4.rotateY(seaweed3MatrixB,seaweed3MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed3MatrixB,seaweed3MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed3MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixC,seaweedMatrixC,[-0.5,-0.16,-0.3]);
+            let seaweed1MatrixC = mat4.clone(seaweedMatrixC);
+            mat4.rotateZ(seaweedMatrixC,seaweedMatrixC,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixC,seaweedMatrixC,130* 0.0174533);
+            mat4.scale(seaweedMatrixC,seaweedMatrixC,[0.05,0.5,0.15]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixC,seaweed1MatrixC,[0,1,0]);
+            let seaweed2MatrixC = mat4.clone(seaweed1MatrixC);
+            mat4.rotateZ(seaweed1MatrixC,seaweed1MatrixC,10* 0.0174533);
+            mat4.rotateY(seaweed1MatrixC,seaweed1MatrixC,40* 0.0174533);
+            mat4.scale(seaweed1MatrixC,seaweed1MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(seaweed2MatrixC,seaweed2MatrixC,[0.2,1,-0.2]);
+            mat4.rotateZ(seaweed2MatrixC,seaweed2MatrixC,-30* 0.0174533);
+            mat4.rotateX(seaweed2MatrixC,seaweed2MatrixC,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixC,seaweed2MatrixC,40* 0.0174533);
+            mat4.scale(seaweed2MatrixC,seaweed2MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+            
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            //SEAWEED  4 seaweedcolor
+            
+            colorsBuffer = initBuffers(gl,positionsBox,seaweedcolor);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-8,0.6,5]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.6,0.3]);
+            seaweedMatrix = mat4.clone(modelViewMatrix);
+            seaweedMatrixB = mat4.clone(modelViewMatrix);
+            seaweedMatrixC = mat4.clone(modelViewMatrix);
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,5* 0.0174533);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.10,0.8,0.3]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrix,seaweedMatrix,[0.3,1.5,0]);
+            seaweed1Matrix = mat4.clone(seaweedMatrix);
+            mat4.rotateZ(seaweedMatrix,seaweedMatrix,-25 * 0.0174533);
+            mat4.rotateY(seaweedMatrix,seaweedMatrix,20* 0.0174533);
+            mat4.scale(seaweedMatrix,seaweedMatrix,[0.1,0.8,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1Matrix,seaweed1Matrix,[0.1,1.5,0]);
+            seaweed2Matrix = mat4.clone(seaweed1Matrix);
+            mat4.rotateZ(seaweed1Matrix,seaweed1Matrix,20 * 0.0174533);
+            mat4.rotateY(seaweed1Matrix,seaweed1Matrix,-20* 0.0174533);
+            mat4.scale(seaweed1Matrix,seaweed1Matrix,[0.1,0.8,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2Matrix,seaweed2Matrix,[-0.45,1.3,-0.3]);
+            mat4.rotateZ(seaweed2Matrix,seaweed2Matrix,20 * 0.0174533);
+            mat4.rotateX(seaweed2Matrix,seaweed2Matrix,-20* 0.0174533);
+            mat4.rotateY(seaweed2Matrix,seaweed2Matrix,40* 0.0174533);
+            mat4.scale(seaweed2Matrix,seaweed2Matrix,[0.05,0.5,0.05]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixB,seaweedMatrixB,[-0.5,0,0.3]);
+            seaweed1MatrixB = mat4.clone(seaweedMatrixB);
+            mat4.rotateZ(seaweedMatrixB,seaweedMatrixB,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixB,seaweedMatrixB,40* 0.0174533);
+            mat4.scale(seaweedMatrixB,seaweedMatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixB,seaweed1MatrixB,[-0.2,1,0.2]);
+            seaweed2MatrixB = mat4.clone(seaweed1MatrixB);
+            mat4.rotateZ(seaweed1MatrixB,seaweed1MatrixB,25 * 0.0174533);
+            mat4.rotateX(seaweed1MatrixB,seaweed1MatrixB,20* 0.0174533);
+            mat4.rotateY(seaweed1MatrixB,seaweed1MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed1MatrixB,seaweed1MatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2MatrixB,seaweed2MatrixB,[-0.2,1,0]);
+            seaweed3MatrixB = mat4.clone(seaweed2MatrixB);
+            mat4.rotateZ(seaweed2MatrixB,seaweed2MatrixB,1 * 0.0174533);
+            mat4.rotateX(seaweed2MatrixB,seaweed2MatrixB,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixB,seaweed2MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed2MatrixB,seaweed2MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed3MatrixB,seaweed3MatrixB,[-0.2,1,0.2]);
+            mat4.rotateZ(seaweed3MatrixB,seaweed3MatrixB,10 * 0.0174533);
+            mat4.rotateX(seaweed3MatrixB,seaweed3MatrixB,30* 0.0174533);
+            mat4.rotateY(seaweed3MatrixB,seaweed3MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed3MatrixB,seaweed3MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed3MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixC,seaweedMatrixC,[-0.5,-0.16,-0.3]);
+            seaweed1MatrixC = mat4.clone(seaweedMatrixC);
+            mat4.rotateZ(seaweedMatrixC,seaweedMatrixC,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixC,seaweedMatrixC,130* 0.0174533);
+            mat4.scale(seaweedMatrixC,seaweedMatrixC,[0.05,0.5,0.15]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixC,seaweed1MatrixC,[0,1,0]);
+            seaweed2MatrixC = mat4.clone(seaweed1MatrixC);
+            mat4.rotateZ(seaweed1MatrixC,seaweed1MatrixC,10* 0.0174533);
+            mat4.rotateY(seaweed1MatrixC,seaweed1MatrixC,40* 0.0174533);
+            mat4.scale(seaweed1MatrixC,seaweed1MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(seaweed2MatrixC,seaweed2MatrixC,[0.2,1,-0.2]);
+            mat4.rotateZ(seaweed2MatrixC,seaweed2MatrixC,-30* 0.0174533);
+            mat4.rotateX(seaweed2MatrixC,seaweed2MatrixC,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixC,seaweed2MatrixC,40* 0.0174533);
+            mat4.scale(seaweed2MatrixC,seaweed2MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            modelViewMatrix = mat4.create(); 
+            
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+             //SEAWEED  4 seaweedcolor
+            
+            colorsBuffer = initBuffers(gl,positionsBox,seaweedcolor);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-8,0.6,-6]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,0.8,0.6]);
+            seaweedMatrix = mat4.clone(modelViewMatrix);
+            seaweedMatrixB = mat4.clone(modelViewMatrix);
+            seaweedMatrixC = mat4.clone(modelViewMatrix);
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,5* 0.0174533);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.10,0.8,0.3]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrix,seaweedMatrix,[0.3,1.5,0]);
+            seaweed1Matrix = mat4.clone(seaweedMatrix);
+            mat4.rotateZ(seaweedMatrix,seaweedMatrix,-25 * 0.0174533);
+            mat4.rotateY(seaweedMatrix,seaweedMatrix,20* 0.0174533);
+            mat4.scale(seaweedMatrix,seaweedMatrix,[0.1,0.8,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1Matrix,seaweed1Matrix,[0.1,1.5,0]);
+            seaweed2Matrix = mat4.clone(seaweed1Matrix);
+            mat4.rotateZ(seaweed1Matrix,seaweed1Matrix,20 * 0.0174533);
+            mat4.rotateY(seaweed1Matrix,seaweed1Matrix,-20* 0.0174533);
+            mat4.scale(seaweed1Matrix,seaweed1Matrix,[0.1,0.8,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2Matrix,seaweed2Matrix,[-0.45,1.3,-0.3]);
+            mat4.rotateZ(seaweed2Matrix,seaweed2Matrix,20 * 0.0174533);
+            mat4.rotateX(seaweed2Matrix,seaweed2Matrix,-20* 0.0174533);
+            mat4.rotateY(seaweed2Matrix,seaweed2Matrix,40* 0.0174533);
+            mat4.scale(seaweed2Matrix,seaweed2Matrix,[0.05,0.5,0.05]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixB,seaweedMatrixB,[-0.5,0,0.3]);
+            seaweed1MatrixB = mat4.clone(seaweedMatrixB);
+            mat4.rotateZ(seaweedMatrixB,seaweedMatrixB,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixB,seaweedMatrixB,40* 0.0174533);
+            mat4.scale(seaweedMatrixB,seaweedMatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixB,seaweed1MatrixB,[-0.2,1,0.2]);
+            seaweed2MatrixB = mat4.clone(seaweed1MatrixB);
+            mat4.rotateZ(seaweed1MatrixB,seaweed1MatrixB,25 * 0.0174533);
+            mat4.rotateX(seaweed1MatrixB,seaweed1MatrixB,20* 0.0174533);
+            mat4.rotateY(seaweed1MatrixB,seaweed1MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed1MatrixB,seaweed1MatrixB,[0.08,0.6,0.2]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed2MatrixB,seaweed2MatrixB,[-0.2,1,0]);
+            seaweed3MatrixB = mat4.clone(seaweed2MatrixB);
+            mat4.rotateZ(seaweed2MatrixB,seaweed2MatrixB,1 * 0.0174533);
+            mat4.rotateX(seaweed2MatrixB,seaweed2MatrixB,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixB,seaweed2MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed2MatrixB,seaweed2MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed3MatrixB,seaweed3MatrixB,[-0.2,1,0.2]);
+            mat4.rotateZ(seaweed3MatrixB,seaweed3MatrixB,10 * 0.0174533);
+            mat4.rotateX(seaweed3MatrixB,seaweed3MatrixB,30* 0.0174533);
+            mat4.rotateY(seaweed3MatrixB,seaweed3MatrixB,90 * 0.0174533);
+            mat4.scale(seaweed3MatrixB,seaweed3MatrixB,[0.08,0.6,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed3MatrixB, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweedMatrixC,seaweedMatrixC,[-0.5,-0.16,-0.3]);
+            seaweed1MatrixC = mat4.clone(seaweedMatrixC);
+            mat4.rotateZ(seaweedMatrixC,seaweedMatrixC,5* 0.0174533);
+            mat4.rotateY(seaweedMatrixC,seaweedMatrixC,130* 0.0174533);
+            mat4.scale(seaweedMatrixC,seaweedMatrixC,[0.05,0.5,0.15]);
+            drawScene(gl, programInfo, colorsBuffer, seaweedMatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(seaweed1MatrixC,seaweed1MatrixC,[0,1,0]);
+            seaweed2MatrixC = mat4.clone(seaweed1MatrixC);
+            mat4.rotateZ(seaweed1MatrixC,seaweed1MatrixC,10* 0.0174533);
+            mat4.rotateY(seaweed1MatrixC,seaweed1MatrixC,40* 0.0174533);
+            mat4.scale(seaweed1MatrixC,seaweed1MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed1MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            mat4.translate(seaweed2MatrixC,seaweed2MatrixC,[0.2,1,-0.2]);
+            mat4.rotateZ(seaweed2MatrixC,seaweed2MatrixC,-30* 0.0174533);
+            mat4.rotateX(seaweed2MatrixC,seaweed2MatrixC,-20* 0.0174533);
+            mat4.rotateY(seaweed2MatrixC,seaweed2MatrixC,40* 0.0174533);
+            mat4.scale(seaweed2MatrixC,seaweed2MatrixC,[0.03,0.5,0.10]);
+            drawScene(gl, programInfo, colorsBuffer, seaweed2MatrixC, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+
+
+
+
+
+
+
+
+            // ###################################################### //
+
+            // Reset modelViewMatrix to draw another object
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+
+            // ###################################################### //
+            // DRAW SUBMARINE (CHIN)
+            // ###################################################### //
+
+            // DRAW SUBMARINE BASE
+            colorsBuffer = initBuffers(gl,positionsBox,SubColor);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,-SubMove);    // Rotate Sub towards 0,0 pivot 
+
+            // Do this first before rotating towards the pivot
+            mat4.translate(modelViewMatrix,modelViewMatrix,[7,8,0]);        
+            let rotorMatrix = mat4.clone(modelViewMatrix); // clone for later "DRAW SUB ROTOR" // Avoid distortion from other scalings
+            let frontMatrix = mat4.clone(modelViewMatrix);   
+            let BackMatrix = mat4.clone(modelViewMatrix);         
+            let WingMatrix = mat4.clone(modelViewMatrix);         
+            let Wing1Matrix = mat4.clone(modelViewMatrix);    
+            let TailMatrix = mat4.clone(modelViewMatrix);         
+            let windowMatrix = mat4.clone(modelViewMatrix);         
+    
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.2,1,1.7]);              
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[0,0.7,0]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.6,1,0.6]);    
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[0,0.4,0]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.6,0.7,0.6]);    
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[0,1.2,0]);
+            let TubeMatrix = mat4.clone(modelViewMatrix); // clone for DRAW TUBE         
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,1,0.3]);    
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            // FRONT SUB
+
+
+            mat4.translate(frontMatrix,frontMatrix,[0,0,1.7]);
+            let front1Matrix = mat4.clone(frontMatrix)         
+            mat4.scale(frontMatrix,frontMatrix,[1.1,0.94,0.1]);    
+            drawScene(gl, programInfo, colorsBuffer, frontMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            colorsBuffer = initBuffers(gl,positionsBox,MirrorColor);
+            mat4.translate(front1Matrix,front1Matrix,[0,0.5,0]);
+            mat4.rotateX(front1Matrix,front1Matrix,40 * 0.0174533);
+            mat4.scale(front1Matrix,front1Matrix,[1,0.3,0.3]);    
+            drawScene(gl, programInfo, colorsBuffer, front1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(front1Matrix,front1Matrix,[0,-2.4,2.1]);
+            mat4.rotateX(front1Matrix,front1Matrix,1 * 0.0174533);
+            mat4.scale(front1Matrix,front1Matrix,[1,1,1]);    
+            drawScene(gl, programInfo, colorsBuffer, front1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(front1Matrix,front1Matrix,[0,1.5,-0.85]);
+            mat4.rotateX(front1Matrix,front1Matrix,47.5 * 0.0174533);
+            mat4.scale(front1Matrix,front1Matrix,[1,1,1.6]);    
+            drawScene(gl, programInfo, colorsBuffer, front1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+
+            // BACK SUB
+
+            colorsBuffer = initBuffers(gl,positionsBox,SubColor);
+            mat4.translate(BackMatrix,BackMatrix,[0,0,-1.7]);
+            let Back1Matrix = mat4.clone(BackMatrix)         
+            mat4.scale(BackMatrix,BackMatrix,[1.1,0.94,0.1]);    
+            drawScene(gl, programInfo, colorsBuffer, BackMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(Back1Matrix,Back1Matrix,[0,0.5,0]);
+            mat4.rotateX(Back1Matrix,Back1Matrix,40 * 0.0174533);
+            mat4.scale(Back1Matrix,Back1Matrix,[1,0.3,0.3]);    
+            drawScene(gl, programInfo, colorsBuffer, Back1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(Back1Matrix,Back1Matrix,[0,-2.4,2.1]);
+            mat4.rotateX(Back1Matrix,Back1Matrix,1 * 0.0174533);
+            mat4.scale(Back1Matrix,Back1Matrix,[1,1,1]);    
+            drawScene(gl, programInfo, colorsBuffer, Back1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(Back1Matrix,Back1Matrix,[0,0.8,-1.2]);
+            mat4.rotateX(Back1Matrix,Back1Matrix,47.5 * 0.0174533);
+            mat4.scale(Back1Matrix,Back1Matrix,[1,1,1.6]);    
+            drawScene(gl, programInfo, colorsBuffer, Back1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+
+            // DRAW PERISCOPE
+
+            colorsBuffer = initBuffers(gl,positionsBox,SubColor);
+            mat4.translate(TubeMatrix,TubeMatrix,[0,1.1,0.25]);
+            mat4.rotateX(TubeMatrix,TubeMatrix,50 * 0.0174533); 
+            mat4.scale(TubeMatrix,TubeMatrix,[0.5,0.5,0.3]);  
+            //mat4.rotateZ(TubeMatrix,TubeMatrix,TubeMove);   
+            drawScene(gl, programInfo, colorsBuffer, TubeMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[0,1.35,2.7]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,TubeMove); 
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.0,0.3,1.3]);    
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            colorsBuffer = initBuffers(gl,positionsBox,FrameColor);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[0,0,1]);
+            //mat4.rotateY(modelViewMatrix,modelViewMatrix,TubeMove); 
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.5,1.4,0.3]);    
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // TUBE (GLASS)
+            
+            colorsBuffer = initBuffers(gl,positionsBox,MirrorColor);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[0,0,1.2]);
+            //mat4.rotateY(modelViewMatrix,modelViewMatrix,TubeMove); 
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.9,0.8,0.3]);    
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[0,0,1.2]);
+            //mat4.rotateY(modelViewMatrix,modelViewMatrix,TubeMove); 
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.8,0.7,0.3]);    
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // WING (BACK SUB) WingMatrix,Wing1Matrix
+
+            colorsBuffer = initBuffers(gl,positionsBox,SubColor);
+            mat4.translate(WingMatrix,WingMatrix,[0,0.02,-2]);
+            mat4.rotateX(WingMatrix,WingMatrix,170 * 0.0174533);
+            mat4.rotateX(WingMatrix,WingMatrix,150 * 0.0174533); 
+            mat4.scale(WingMatrix,WingMatrix,[0.13,1,0.3]); 
+            mat4.rotateX(WingMatrix,WingMatrix,25 * 0.0174533); 
+            drawScene(gl, programInfo, colorsBuffer, WingMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(Wing1Matrix,Wing1Matrix,[0,-0.3,-1.9]);
+            mat4.rotateX(Wing1Matrix,Wing1Matrix,100 * 0.0174533);
+            mat4.rotateX(Wing1Matrix,Wing1Matrix,170 * 0.0174533);
+            mat4.rotateX(Wing1Matrix,Wing1Matrix,150 * 0.0174533); 
+            mat4.scale(Wing1Matrix,Wing1Matrix,[0.13,1,0.3]); 
+            mat4.rotateX(Wing1Matrix,Wing1Matrix,25 * 0.0174533); 
+            drawScene(gl, programInfo, colorsBuffer, Wing1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // TAIL (BACK SUB) TailMatrix
+
+            mat4.translate(TailMatrix,TailMatrix,[0,-0.05,-2.8]);
+            mat4.scale(TailMatrix,TailMatrix,[0.13,0.13,1]);    
+            drawScene(gl, programInfo, colorsBuffer, TailMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            colorsBuffer = initBuffers(gl,positionsBox,FrameColor);
+            mat4.translate(TailMatrix,TailMatrix,[0,-0.05,-1]);
+            mat4.scale(TailMatrix,TailMatrix,[1.3,1.3,0.2]);    
+            drawScene(gl, programInfo, colorsBuffer, TailMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+
+            // Turbine 
+            colorsBuffer = initBuffers(gl,positionsBox,rotorColor);
+            mat4.translate(rotorMatrix,rotorMatrix,[0,-0.05,-3.8]); 
+            mat4.rotateZ(rotorMatrix,rotorMatrix,rotorMove); 
+            mat4.scale(rotorMatrix,rotorMatrix,[0.15,0.8,0.05]);   
+            drawScene(gl, programInfo, colorsBuffer, rotorMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // WINDOW windowMatrix
+            colorsBuffer = initBuffers(gl,positionsBox,FrameColor);
+            mat4.translate(windowMatrix,windowMatrix,[1.2,0,0.8]);
+            let window1Matrix = mat4.clone(windowMatrix);
+            let window2Matrix = mat4.clone(windowMatrix);      
+            mat4.scale(windowMatrix,windowMatrix,[0.08,0.4,0.4]);    
+            drawScene(gl, programInfo, colorsBuffer, windowMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            colorsBuffer = initBuffers(gl,positionsBox,MirrorColor);
+            mat4.translate(windowMatrix,windowMatrix,[0.5,0,0]);
+            mat4.scale(windowMatrix,windowMatrix,[1,-0.8,-0.8]);    
+            drawScene(gl, programInfo, colorsBuffer, windowMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            colorsBuffer = initBuffers(gl,positionsBox,FrameColor);
+            mat4.translate(window1Matrix,window1Matrix,[0,0,-1.6]);         
+            mat4.scale(window1Matrix,window1Matrix,[0.08,0.4,0.4]);    
+            drawScene(gl, programInfo, colorsBuffer, window1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            colorsBuffer = initBuffers(gl,positionsBox,MirrorColor);
+            mat4.translate(window1Matrix,window1Matrix,[0.5,0,0]);
+            mat4.scale(window1Matrix,window1Matrix,[1,-0.8,-0.8]);    
+            drawScene(gl, programInfo, colorsBuffer, window1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            colorsBuffer = initBuffers(gl,positionsBox,FrameColor);
+            mat4.translate(window2Matrix,window2Matrix,[-2.4,0,0]); 
+            let window3Matrix = mat4.clone(window2Matrix);          
+            mat4.scale(window2Matrix,window2Matrix,[0.08,0.4,0.4]);    
+            drawScene(gl, programInfo, colorsBuffer, window2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            colorsBuffer = initBuffers(gl,positionsBox,MirrorColor);
+            mat4.translate(window2Matrix,window2Matrix,[-0.5,0,0]);
+            mat4.scale(window2Matrix,window2Matrix,[1,-0.8,-0.8]);    
+            drawScene(gl, programInfo, colorsBuffer, window2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);        
+            
+            colorsBuffer = initBuffers(gl,positionsBox,FrameColor);
+            mat4.translate(window3Matrix,window3Matrix,[0,0,-1.6]); 
+            mat4.scale(window3Matrix,window3Matrix,[0.08,0.4,0.4]);    
+            drawScene(gl, programInfo, colorsBuffer, window3Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            colorsBuffer = initBuffers(gl,positionsBox,MirrorColor);
+            mat4.translate(window3Matrix,window3Matrix,[-0.5,0,0]);
+            mat4.scale(window3Matrix,window3Matrix,[1,-0.8,-0.8]);    
+            drawScene(gl, programInfo, colorsBuffer, window3Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);   
+
+
+            // ###################################################### //
+
+            // Reset modelViewMatrix to draw another object
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            // DRAW BOAT
+            // ###################################################### //
+            colorsBuffer = initBuffers(gl,positionsBox,boatColor);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[boatMoveX,0.3,boatMoveZ]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,boatRotateY * 0.0174533);  
+            let boatMatrix = mat4.clone(modelViewMatrix);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.8,0.3,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // DRAW FRONT
+            mat4.translate(boatMatrix,boatMatrix,[0,0,-1]);
+            mat4.rotateY(boatMatrix,boatMatrix,45 * 0.0174533);  
+            mat4.scale(boatMatrix,boatMatrix,[0.4,0.2,0.4]);
+            drawScene(gl, programInfo, colorsBuffer, boatMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // DRAW BACK
+            mat4.translate(boatMatrix,boatMatrix,[-3.5,0,3.5]);
+            drawScene(gl, programInfo, colorsBuffer, boatMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // DRAW POLL
+            colorsBuffer = initBuffers(gl,positionsBox,darkGreyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[0,5,0]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.1,5,0.1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // DRAW FLAG
+            colorsBuffer = initBuffers(gl,positionsBox,flagColor);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,flagMove); // Rotate towards original origin
+            mat4.translate(modelViewMatrix,modelViewMatrix,[0,0.5,5]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.1,0.5,5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+        }
+
+        
+
+        // Array for variance of greyColors
+        var greyColors = [   
+            [0.7,  0.7,  0.7, 1.0],    
+            [0.7,  0.7,  0.7, 1.0],    
+            [0.7,  0.7,  0.7, 1.0],    
+            [0.7,  0.7,  0.7, 1.0],    
+            [0.7,  0.7,  0.7, 1.0],       
+            [0.7,  0.7,  0.7, 1.0],      
+            [0.7,  0.7,  0.7, 1.0],    
+        ];
+
+        var OceanColors = [
+            [0.29, 0.522, 0.949, 0.5],
+            [0.29, 0.522, 0.949, 0.5],
+            [0.29, 0.522, 0.949, 0.5],
+            [0.29, 0.522, 0.949, 0.5],
+            [0.29, 0.522, 0.949, 0.5],
+            [0.29, 0.522, 0.949, ],
+        ];
+
+        var darkGreyColors = [   
+            [0.569, 0.569, 0.569, 1.0],  
+            [0.569, 0.569, 0.569, 1.0],  
+            [0.569, 0.569, 0.569, 1.0],  
+            [0.569, 0.569, 0.569, 1.0],  
+            [0.569, 0.569, 0.569, 1.0],  
+            [0.569, 0.569, 0.569, 1.0],  
+        ];
+
+        var greenColors = [ 
+            [0, 0.990, 0.990, 1.0],    
+            [0, 0.990, 0.990, 1.0],   
+            [0, 0.880, 0.880, 1.0],   
+            [0, 0.880, 0.880, 1.0],   
+            [0, 0.770, 0.770, 1.0],   
+            [0, 0.770, 0.770, 1.0],   
+        ];
+
+        var brownColors = [
+            [0.62, 0.4, 0, 1.0],
+            [0.62, 0.4, 0, 1.0],
+            [0.62, 0.4, 0, 1.0],
+            [0.62, 0.4, 0, 1.0],
+            [0.62, 0.4, 0, 1.0],
+            [0.62, 0.4, 0, 1.0],
+        ];
+
+        var bluegreyColors = [
+            [0.592, 0.655, 0.82, 1.0],
+            [0.592, 0.655, 0.82, 1.0],
+            [0.592, 0.655, 0.82, 1.0],
+            [0.592, 0.655, 0.82, 1.0],
+            [0.592, 0.655, 0.82, 1.0],
+            [0.592, 0.655, 0.82, 1.0],
+        ];
+
+        var lightblueColors = [
+            [0.941, 0.957, 1, 1.0],
+            [0.941, 0.957, 1, 1.0],
+            [0.941, 0.957, 1, 1.0],
+            [0.941, 0.957, 1, 1.0],
+            [0.941, 0.957, 1, 1.0],
+            [0.941, 0.957, 1, 1.0],
+        ];
+
+        var darkblueColors = [
+            [0.063, 0.067, 0.078, 1.0],
+            [0.063, 0.067, 0.078, 1.0],
+            [0.063, 0.067, 0.078, 1.0],
+            [0.063, 0.067, 0.078, 1.0],
+            [0.063, 0.067, 0.078, 1.0],
+            [0.063, 0.067, 0.078, 1.0],
+        ];
+
+        var seaweedcolor = [
+            [0.431, 0.6, 0.31, 1.0],
+            [0.431, 0.6, 0.31, 1.0],
+            [0.431, 0.6, 0.31, 1.0],
+            [0.431, 0.6, 0.31, 1.0],
+            [0.431, 0.6, 0.31, 1.0],
+            [0.431, 0.6, 0.31, 1.0],
+        ];
+        var SpongebobHouseColors = [
+            [1, 1, 0, 1.0],
+            [1, 1, 0, 1.0],
+            [1, 1, 0, 1.0],
+            [1, 1, 0, 1.0],
+            [1, 1, 0, 1.0],
+            [1, 1, 0, 1.0],
+        ];
+
+        var pipeappleLeafColors = [
+            [0.216, 1, 0, 1.0],
+            [0.216, 1, 0, 1.0],
+            [0.216, 1, 0, 1.0],
+            [0.216, 1, 0, 1.0],
+            [0.216, 1, 0, 1.0],
+            [0.216, 1, 0, 1.0],
+        ];
+
+        var doorBlueColour = [
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+        ]
+        var pipeBlueColors = [
+            [0.678, 0.855, 0.878, 1.0],
+            [0.678, 0.855, 0.878, 1.0],
+            [0.678, 0.855, 0.878, 1.0],
+            [0.678, 0.855, 0.878, 1.0],
+            [0.678, 0.855, 0.878, 1.0],
+            [0.678, 0.855, 0.878, 1.0],
+        ]
+        var pipePortColors = [
+            [0.21, 0.21, 0.21, 1.0],
+            [0.21, 0.21, 0.21, 1.0],
+            [0.21, 0.21, 0.21, 1.0],
+            [0.21, 0.21, 0.21, 1.0],
+            [0.21, 0.21, 0.21, 1.0],
+            [0.21, 0.21, 0.21, 1.0],
+        ]
+        var strawberryColor = [
+            [1, 0, 0.376, 1.0],
+            [1, 0, 0.376, 1.0],
+            [1, 0, 0.376, 1.0],
+            [1, 0, 0.376, 1.0],
+            [1, 0, 0.376, 1.0],
+            [1, 0, 0.376, 1.0],
+        ]
+        var turtleColour = [
+            [0.502, 1, 0.702, 1.0],
+            [0.502, 1, 0.702, 1.0],
+            [0.502, 1, 0.702, 1.0],
+            [0.502, 1, 0.702, 1.0],
+            [0.502, 1, 0.702, 1.0],
+            [0.502, 1, 0.702, 1.0],
+        ]
+        var turtleHandColour = [
+            [0.557, 0.612, 0.443, 1.0],
+            [0.557, 0.612, 0.443, 1.0],
+            [0.557, 0.612, 0.443, 1.0],
+            [0.557, 0.612, 0.443, 1.0],
+            [0.557, 0.612, 0.443, 1.0],
+            [0.557, 0.612, 0.443, 1.0],
+        ]
+
+
+        // Define new colors for the Jellyfish (wong)
+// These are base RGB colors with full opacity, alpha will be applied dynamically
+const JellyFishBodyColorBase = [
+    [0.7, 0.9, 1.0, 1.0], // Light Blue
+    [0.7, 0.9, 1.0, 1.0],
+    [0.7, 0.9, 1.0, 1.0],
+    [0.7, 0.9, 1.0, 1.0],
+    [0.7, 0.9, 1.0, 1.0],
+    [0.7, 0.9, 1.0, 1.0],
+];
+
+const alternateJellyFishBodyColorBase = [
+    [1.0, 0.5, 0.0, 1.0], // Orange for alternate body color
+    [1.0, 0.5, 0.0, 1.0],
+    [1.0, 0.5, 0.0, 1.0],
+    [1.0, 0.5, 0.0, 1.0],
+    [1.0, 0.5, 0.0, 1.0],
+    [1.0, 0.5, 0.0, 1.0],
+];
+
+const JellyFishTentacleColorBase = [
+    [1.0, 0.7, 0.8, 1.0], // Pinkish
+    [1.0, 0.7, 0.8, 1.0],
+    [1.0, 0.7, 0.8, 1.0],
+    [1.0, 0.7, 0.8, 1.0],
+    [1.0, 0.7, 0.8, 1.0],
+    [1.0, 0.7, 0.8, 1.0],
+];
+
+const darkJellyFishTentacleColorBase = [
+    [0.463, 0.282, 0.878, 1.0], // Darker blue
+    [0.463, 0.282, 0.878, 1.0],
+    [0.463, 0.282, 0.878, 1.0],
+    [0.463, 0.282, 0.878, 1.0],
+    [0.463, 0.282, 0.878, 1.0],
+    [0.463, 0.282, 0.878, 1.0],
+];
+
+// Global variables for current colors, these will be used in initBuffers
+var JellyFishBodyColour; // Will hold the active color array for body/bell
+var JellyFishTentacleColour; // Will hold the active color array for tentacles/oral arms
+
+// Booleans for color toggling
+var JellyFishBodyColorBool = true; // True for light blue, false for orange (initially)
+var JellyfishTentacleColorBool = true; // True for pink, false for dark blue (initially)
+
+// Alpha slider value
+var alphaJellyFishValue = 1.0; // Default alpha
+
+// Helper to apply a given alpha to a base color array
+function applyAlphaToColorArray(baseColorArray, alpha) {
+    return baseColorArray.map(color => [...color.slice(0, 3), alpha]);
+}
+
+// Unified function to update all jellyfish colors and apply current alpha
+function updateJellyFishColors() {
+    // Determine the base RGB color for the body based on its toggle state
+    let bodyBase = JellyFishBodyColorBool ? JellyFishBodyColorBase : alternateJellyFishBodyColorBase;
+    // Determine the base RGB color for the tentacles/oral arms based on their toggle state
+    let tentacleBase = JellyfishTentacleColorBool ? JellyFishTentacleColorBase : darkJellyFishTentacleColorBase;
+
+    // Apply the current alpha value to the chosen base colors and assign to global variables
+    JellyFishBodyColour = applyAlphaToColorArray(bodyBase, alphaJellyFishValue);
+    JellyFishTentacleColour = applyAlphaToColorArray(tentacleBase, alphaJellyFishValue);
+}
+
+        // Define new colors for the Fish (wong)
+        const fishBlueColor = [
+            [0.0, 0.5, 1.0, 1.0], // Blue
+            [0.0, 0.5, 1.0, 1.0],
+            [0.0, 0.5, 1.0, 1.0],
+            [0.0, 0.5, 1.0, 1.0],
+            [0.0, 0.5, 1.0, 1.0],
+            [0.0, 0.5, 1.0, 1.0],
+        ];
+
+        const fishGreenColor = [
+            [0.2, 0.8, 0.4, 1.0], // Green alternate
+            [0.2, 0.8, 0.4, 1.0],
+            [0.2, 0.8, 0.4, 1.0],
+            [0.2, 0.8, 0.4, 1.0],
+            [0.2, 0.8, 0.4, 1.0],
+            [0.2, 0.8, 0.4, 1.0],
+        ];
+
+        // --- Seahorse Color Definitions --- (tiffany)
+        const seahorseOrangeColor = [
+            [1.0, 0.475, 0.188, 1.0], // Orange
+            [1.0, 0.475, 0.188, 1.0],
+            [1.0, 0.475, 0.188, 1.0],
+            [1.0, 0.475, 0.188, 1.0],
+            [1.0, 0.475, 0.188, 1.0],
+            [1.0, 0.475, 0.188, 1.0],
+        ];
+
+        const seahorseBlueColor = [
+            [0.773, 0.89, 0.98, 1.0], // Light Blue (alternate for head/tail)
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+        ];
+
+        const seahorseGreenColor = [
+            [0.3, 0.7, 0.3, 1.0], // Green (default for body/nose)
+            [0.3, 0.7, 0.3, 1.0],
+            [0.3, 0.7, 0.3, 1.0],
+            [0.3, 0.7, 0.3, 1.0],
+            [0.3, 0.7, 0.3, 1.0],
+            [0.3, 0.7, 0.3, 1.0],
+        ];
+
+        const seahorseDarkGreenColor = [
+            [0.2, 0.5, 0.2, 1.0], // Darker Green (alternate for body/nose)
+            [0.2, 0.5, 0.2, 1.0],
+            [0.2, 0.5, 0.2, 1.0],
+            [0.2, 0.5, 0.2, 1.0],
+            [0.2, 0.5, 0.2, 1.0],
+            [0.2, 0.5, 0.2, 1.0],
+        ];
+
+        const seahorsePinkColor = [
+            [1.0, 0.7, 0.8, 1.0], // Pink for fins (example)
+            [1.0, 0.7, 0.8, 1.0],
+            [1.0, 0.7, 0.8, 1.0],
+            [1.0, 0.7, 0.8, 1.0],
+            [1.0, 0.7, 0.8, 1.0],
+            [1.0, 0.7, 0.8, 1.0],
+        ];
+
+
+        //--- Global Color Variables for Drawing ---
+        var seahorseHeadColour = seahorseOrangeColor; // Used for head, tail segment 2
+        var seahorseBodyColour = seahorseGreenColor; // Used for body, nose
+        var seahorseTailColour = seahorseOrangeColor; // Used for tail segments 1, 3, fins
+
+
+        var rotateX = 0, rotateY = 0, rotateZ = 0;
+
+        // Mouse drag to rotateX & rotateY
+        // *******************************
+        var prevx, prevy, canvas;
+        var dragging = false;
+
+        function doMouseDown(evt) {
+            if (dragging)
+                return;
+            dragging = true;
+            document.addEventListener("mousemove", doMouseDrag, false);
+            document.addEventListener("mouseup", doMouseUp, false);
+            var box = canvas.getBoundingClientRect();
+            prevx = window.pageXOffset + evt.clientX - box.left;
+            prevy = window.pageYOffset + evt.clientY - box.top;
+        }
+
+        function doMouseDrag(evt) {
+            if (!dragging)
+                return;
+            var box = canvas.getBoundingClientRect();
+            var x = window.pageXOffset + evt.clientX - box.left;
+            var y = window.pageYOffset + evt.clientY - box.top;
+            let diffy = (prevx - x) * 0.01;
+            let diffx = (prevy - y) * 0.01;
+            prevx = x;
+            prevy = y;
+            rotateX = rotateX - diffx;
+            rotateY = rotateY - diffy;
+            main();
+        }
+        
+        function doMouseUp(evt) {
+            if (dragging) {
+                document.removeEventListener("mousemove", doMouseDrag, false);
+                document.removeEventListener("mouseup", doMouseUp, false);
+                dragging = false;
+            }
+        }
+        
+        function resetRotation() {
+            rotateX = 0, rotateY = 0, rotateZ = 0;
+            main();
+        }
+        // *******************************
+        
+        var cubeRotation1 = 0.0, cubeRotation2 = 0.0, cubeRotation3 = 0.0;
+        var fieldOfViewC1 = 45, zNear = 0.1, zFar = 50, zPosition = 0, zPositionObj = -10;
+        window.onload = main;
+
+        // ########################################### //
+        // initBuffers 
+        //
+        // Initialize the buffers we'll need. For this demo, we just
+        // have one object -- a simple three-dimensional cube.
+        //
+        function initBuffers(gl,positions,faceColors) {
+
+            // Create a buffer for the square's positions.
+            const positionBuffer = gl.createBuffer();
+
+            // Select the positionBuffer as the one to apply buffer
+            // operations to from here out.
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+            // Now pass the list of positions into WebGL to build the
+            // shape. We do this by creating a Float32Array from the
+            // JavaScript array, then use it to fill the current buffer.
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+            // ** LIGHTING **
+            // Set up the normals for the vertices, so that we can compute lighting.
+            const normalBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+
+            // ** LIGHTING **
+            const vertexNormals = [
+                // Front
+                0.0,  0.0,  1.0,
+                0.0,  0.0,  1.0,
+                0.0,  0.0,  1.0,
+                0.0,  0.0,  1.0,
+
+                // Back
+                0.0,  0.0, -1.0,
+                0.0,  0.0, -1.0,
+                0.0,  0.0, -1.0,
+                0.0,  0.0, -1.0,
+
+                // Top
+                0.0,  1.0,  0.0,
+                0.0,  1.0,  0.0,
+                0.0,  1.0,  0.0,
+                0.0,  1.0,  0.0,
+
+                // Bottom
+                0.0, -1.0,  0.0,
+                0.0, -1.0,  0.0,
+                0.0, -1.0,  0.0,
+                0.0, -1.0,  0.0,
+
+                // Right
+                1.0,  0.0,  0.0,
+                1.0,  0.0,  0.0,
+                1.0,  0.0,  0.0,
+                1.0,  0.0,  0.0,
+
+                // Left
+                -1.0,  0.0,  0.0,
+                -1.0,  0.0,  0.0,
+                -1.0,  0.0,  0.0,
+                -1.0,  0.0,  0.0
+            ];
+
+            // ** LIGHTING **
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW);
+
+            // Color buffer                
+            var colors = [];
+
+            for (var j = 0; j < faceColors.length; ++j) {
+                const c = faceColors[j];
+                colors = colors.concat(c, c, c, c);
+            }
+
+            const colorBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+
+            // Build the element array buffer; this specifies the indices
+            // into the vertex arrays for each face's vertices.
+            const indexBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+            // This array defines each face as two triangles, using the
+            // indices into the vertex array to specify each triangle's
+            // position.
+            const indices = [
+                0,  1,  2,      0,  2,  3,    // front
+                4,  5,  6,      4,  6,  7,    // back
+                8,  9,  10,     8,  10, 11,   // top
+                12, 13, 14,     12, 14, 15,   // bottom
+                16, 17, 18,     16, 18, 19,   // right
+                20, 21, 22,     20, 22, 23,   // left
+            ];
+
+            // Now send the element array to GL
+
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
+            return {
+                position: positionBuffer,
+                normal: normalBuffer, // ** LIGHTING **
+                color: colorBuffer,
+                indices: indexBuffer,
+            };
+        }
+
+        // ########################################### //
+        // Draw the scene.
+        //
+        function drawScene(gl, programInfo, buffers, modelViewMatrix, projectionMatrix) {
+            // Tell WebGL how to pull out the positions from the position
+            // buffer into the vertexPosition attribute.
+            {
+                const numComponents = 3; // (x,y,z)
+                const type = gl.FLOAT;
+                const normalize = false;
+                const stride = 0;
+                const offset = 0;
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+                gl.vertexAttribPointer(
+                    programInfo.attribLocations.vertexPosition,
+                    numComponents,
+                    type,
+                    normalize,
+                    stride,
+                    offset);
+                gl.enableVertexAttribArray(
+                    programInfo.attribLocations.vertexPosition);
+            }
+
+            // Tell WebGL how to pull out the colors from the color buffer
+            // into the vertexColor attribute.
+            {
+                const numComponents = 4; // (r,g,b,a)
+                const type = gl.FLOAT;
+                const normalize = false;
+                const stride = 0;
+                const offset = 0;
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+                gl.vertexAttribPointer(
+                    programInfo.attribLocations.vertexColor,
+                    numComponents,
+                    type,
+                    normalize,
+                    stride,
+                    offset);
+                gl.enableVertexAttribArray(
+                    programInfo.attribLocations.vertexColor);
+            }
+
+            // ** LIGHTING ** Start ---
+            var normalMatrix = mat4.create();
+            mat4.invert(normalMatrix, modelViewMatrix);
+            mat4.transpose(normalMatrix, normalMatrix);
+
+            // Tell WebGL how to pull out the normals from
+            // the normal buffer into the vertexNormal attribute.
+            {
+                const numComponents = 3; // (x, y, z)
+                const type = gl.FLOAT;
+                const normalize = false;
+                const stride = 0;
+                const offset = 0;
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+                gl.vertexAttribPointer(
+                    programInfo.attribLocations.vertexNormal,
+                    numComponents,
+                    type,
+                    normalize,
+                    stride,
+                    offset);
+                gl.enableVertexAttribArray(
+                    programInfo.attribLocations.vertexNormal);
+            }    
+            // ** LIGHTING ** Finish ---
+
+            // Tell WebGL which indices to use to index the vertices
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
+
+            // Tell WebGL to use our program when drawing
+            gl.useProgram(programInfo.program);
+
+            // Set the shader uniforms
+            gl.uniformMatrix4fv(
+                programInfo.uniformLocations.projectionMatrix,
+                false,
+                projectionMatrix);
+            gl.uniformMatrix4fv(
+                programInfo.uniformLocations.modelViewMatrix,
+                false,
+                modelViewMatrix);
+
+            // ** LIGHTING **    
+            gl.uniformMatrix4fv(
+                programInfo.uniformLocations.normalMatrix,
+                false,
+                normalMatrix);
+        }
+
+        // ########################################### //
+        // Initialize a shader program, so WebGL knows how to draw our data
+        //
+        function initShaderProgram(gl, vsSource, fsSource) {
+            const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+            const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+            // Create the shader program
+            const shaderProgram = gl.createProgram();
+            gl.attachShader(shaderProgram, vertexShader);
+            gl.attachShader(shaderProgram, fragmentShader);
+            gl.linkProgram(shaderProgram);
+
+            // If creating the shader program failed, alert
+            if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+                alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+                return null;
+            }
+
+            return shaderProgram;
+        }
+
+        // ########################################### //
+        // creates a shader of the given type, uploads the source and
+        // compiles it.
+        //
+        function loadShader(gl, type, source) {
+            const shader = gl.createShader(type);
+
+            // Send the source to the shader object
+            gl.shaderSource(shader, source);
+
+            // Compile the shader program
+            gl.compileShader(shader);
+
+            // See if it compiled successfully
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+                gl.deleteShader(shader);
+                return null;
+            }
+
+            return shader;
+        }
+
+        // ########################################### //
+        // CAMERA & PROJECTION functions
+        // ########################################### //
+
+        // Reset camera
+        function resetCamera() {
+            document.getElementById("c1Value").value = 45;
+            document.getElementById("c2Value").value = 0;
+            document.getElementById("c3Value").value = 0;
+            document.getElementById("c4Value").value = 0;
+            document.getElementById("c5Value").value = 0;
+            document.getElementById("c6Value").value = 0.1;
+            document.getElementById("c7Value").value = 500;
+
+            document.getElementById("c1Label").textContent = 45;
+            document.getElementById("c2Label").textContent = 0;
+            document.getElementById("c3Label").textContent = 0;
+            document.getElementById("c4Label").textContent = 0;
+            document.getElementById("c5Label").textContent = 0;
+            document.getElementById("c6Label").textContent = 0.1;
+            document.getElementById("c7Label").textContent = 50;
+
+            rotateX = 0, rotateY = 0, rotateZ = 0;
+            fieldOfViewC1 = 45;
+            zPosition = 0;
+            zNear = 1.0, zFar = 50;
+            main();
+
+            
+        }
+        
+        // Field of view
+        function changeC1value() {
+            let c1Value = parseInt(document.getElementById("c1Value").value, 10);
+            document.getElementById("c1Label").innerHTML = c1Value;
+            fieldOfViewC1 = c1Value;
+            
+            main();
+            
+        }
+
+        // Camera rotate-x
+        function changeC2value() {
+            let c2Value = document.getElementById("c2Value").value;
+            document.getElementById("c2Label").innerHTML = c2Value;
+            // convert slider value to "radians" (by multiplying to 0.0174533) and put value into global variable "rotateX"
+            rotateX = c2Value * 0.0174533;
+            // calling the main() function
+            main();  
+        }
+
+        // z-Position
+        function changeC3value() {
+            let c3Value = document.getElementById("c3Value").value;
+            document.getElementById("c3Label").innerHTML = c3Value;
+            zPosition = c3Value;
+            main(); 
+        }
+
+        // Camera rotate-y
+        function changeC4value() {
+            let c4Value = document.getElementById("c4Value").value;
+            document.getElementById("c4Label").innerHTML = c4Value;
+            // convert slider value to "radians" (by multiplying to 0.0174533) and put value into global variable "rotateX"
+            rotateY = c4Value * 0.0174533;
+            // calling the main() function
+            main();  
+        }
+
+        // Camera rotate-z
+        function changeC5value() {
+            let c5Value = document.getElementById("c5Value").value;
+            document.getElementById("c5Label").innerHTML = c5Value;
+            // convert slider value to "radians" (by multiplying to 0.0174533) and put value into global variable "rotateX"
+            rotateX = c5Value * 0.0174533;
+            // calling the main() function
+            main();  
+        }
+
+        // z-Near
+        function changeC6value() {
+            let c6Value = document.getElementById("c6Value").value / 10;
+            document.getElementById("c6Label").innerHTML = c6Value;
+            zNear = c6Value;
+            main();
+        }
+
+        // z-Far
+        function changeC7value() {
+            let c7Value = document.getElementById("c7Value").value / 10;
+            document.getElementById("c7Label").innerHTML = c7Value;
+            zFar = c7Value;
+            main();
+        }
+
+
+
+        // ########################################### //
+        // Sub TRANSFORMATION & COLOR functions
+        // ########################################### //
+
+        var SubBool = true, SubMove = 0, SubSpeed = 0.2;
+        var timer = setInterval(function(){ animateSubMoveLoop() }, 10);
+
+        function stopSubmarine() {
+            if (SubBool == true) { SubBool = false; }
+            else { SubBool = true; }
+
+            if (SubBool == true) {
+                timer = setInterval(function(){ animateSubMoveLoop() }, 10);
+                document.getElementById("stopSubmarine").value = "Stop Submarine";
+            } else {
+                clearInterval(timer);
+                document.getElementById("stopSubmarine").value = "Start Submarine";
+            }
+        }
+
+        function animateSubMoveLoop() {
+            if (SubMove > 360) { SubMove = 0; }
+            else { SubMove = SubMove + (SubSpeed * 0.0174533);  }
+            main();
+        }
+
+        function speedSubmarine() {
+            SubSpeed = document.getElementById("speedSubmarine").value; 
+            document.getElementById("speedsubLabel").innerHTML = SubSpeed;
+        }
+
+        // Propeller
+        var SubRotorBool = true, rotorMove = 0, rotorSpeed = 50;;
+        var timer2 = setInterval(function(){ animateRotorMoveLoop() }, 10);
+
+        function stopProp() {
+            if (SubRotorBool == true) { SubRotorBool = false; }
+            else { SubRotorBool = true; }
+
+            if (SubRotorBool == true) {
+                timer2 = setInterval(function(){ animateRotorMoveLoop() }, 10);
+                document.getElementById("stopProp").value = "Stop Propeller";
+            } else {
+                clearInterval(timer2);
+                document.getElementById("stopProp").value = "Start Propeller";
+            }
+        }
+
+        function animateRotorMoveLoop() {
+            if (rotorMove > 360) { rotorMove = 0; }
+            else { rotorMove = rotorMove + (rotorSpeed * 0.0174533);  }
+            main();
+        }
+
+        function speedProp() {
+            rotorSpeed = document.getElementById("speedProp").value; 
+            document.getElementById("sC1Label").innerHTML = rotorSpeed;
+        }
+
+        // Tube
+
+        var TubeBool = true, TubeSpinBool = true, TubeMove = -1, TubeSpeed = 0.5;
+        var timerTube = setInterval(function(){ animateTubeMoveLoop() }, 10);
+
+        function stopTube() {
+            if (TubeBool == true) { TubeBool = false; }
+            else { TubeBool = true; }
+
+            if (TubeBool == true) {
+                timerTube = setInterval(function(){ animateTubeMoveLoop() }, 10);
+                document.getElementById("stopTube").value = "Stop Periscope";
+            } else {
+                clearInterval(timerTube);
+                document.getElementById("stopTube").value = "Start Periscope";
+            }
+        }
+
+        function animateTubeMoveLoop() {
+            if (TubeMove <= -1) { TubeSpinBool = true; }
+            else if (TubeMove >= 1) { TubeSpinBool = false; }
+
+            if (TubeSpinBool == true) { TubeMove += (TubeSpeed * 0.0174533); }
+            else { TubeMove -= (TubeSpeed * 0.0174533); }
+
+            main();
+        }
+
+        function speedTube() {
+            TubeSpeed = document.getElementById("speedTube").value; 
+            document.getElementById("TubeLabel").innerHTML = TubeSpeed;
+        }
+
+
+
+        var SubColor = bluegreyColors, SubColorBool = true;
+        function colorSub() {
+            if (SubColorBool == true) { SubColorBool = false; } 
+            else { SubColorBool = true; }
+
+            alphaSubmarine(); 
+            main();
+        }
+
+        var rotorColor = darkGreyColors, rotorColorBool = true;
+        function colorSub2() {
+            if (rotorColorBool == true) { rotorColorBool = false; } 
+            else { rotorColorBool = true; }
+
+            if (rotorColorBool == true) { rotorColor = darkGreyColors; }
+            else { rotorColor = strawberryColor; }
+
+            main();
+        }
+
+        var MirrorColor = lightblueColors, MirrorColorBool = true;
+        function colorSub3() {
+            if (MirrorColorBool == true) { MirrorColorBool = false; } 
+            else { MirrorColorBool = true; }
+
+            if (MirrorColorBool == true) { MirrorColor = lightblueColors; }
+            else { MirrorColor = strawberryColor; }
+
+            main();
+        }
+
+        var FrameColor = darkblueColors, frameColorBool = true;
+        function colorSub4() {
+            if (frameColorBool == true) { frameColorBool = false; } 
+            else { frameColorBool = true; }
+
+            if (frameColorBool == true) { FrameColor = darkblueColors; }
+            else { FrameColor = strawberryColor; }
+
+            main();
+        }
+
+
+        var alphaP1Value = 1;
+        function alphaSubmarine() {
+            alphaP1Value = document.getElementById("alphaSubmarine").value / 10; 
+            document.getElementById("aPSubLabel").innerHTML = parseFloat(alphaP1Value).toFixed(1);;
+
+            if (SubColorBool == true) {
+                SubColor = [ // bluegreyColors
+                    [0.592, 0.655, 0.82, alphaP1Value],    
+                    [0.592, 0.655, 0.82, alphaP1Value],    
+                    [0.592, 0.655, 0.82, alphaP1Value],    
+                    [0.592, 0.655, 0.82, alphaP1Value],    
+                    [0.592, 0.655, 0.82, alphaP1Value],    
+                    [0.592, 0.655, 0.82, alphaP1Value],    
+                ];
+            } else { 
+                SubColor = [ // strawberryColor
+                    [1, 0, 0.376, alphaP1Value],    
+                    [1, 0, 0.376, alphaP1Value],    
+                    [1, 0, 0.376, alphaP1Value],    
+                    [1, 0, 0.376, alphaP1Value],    
+                    [1, 0, 0.376, alphaP1Value],    
+                    [1, 0, 0.376, alphaP1Value],    
+                ];
+            }
+
+            main();
+        }
+        //################
+        //Setting Turtle//
+        //###############
+        //movement Setting for turtle
+            var TurtleMoveX = 0, TurtleMoveZ = 2.5, TurtleSpeedX = 0.005, TurtleSpeedZ = 0.003, TurtleSpeedVar = 1;
+            var TurtleBool = true, forwardBool = true, TurtleRotateY = -45;
+            var timerTurtle = setInterval(function(){ animateTurtleMoveLoop() }, 10);
+
+            function stopTurtle() {
+            if (TurtleBool == true) { TurtleBool = false; }
+            else { TurtleBool = true; }
+
+            if (TurtleBool == true) {
+                timerTurtle = setInterval(function(){ animateTurtleMoveLoop() }, 10);
+                document.getElementById("stopTurtle").value = "Stop Turtle";
+            } else {
+                clearInterval(timerTurtle);
+                document.getElementById("stopTurtle").value = "Start Turtle";
+            }
+        }
+        function animateTurtleMoveLoop() {
+            if (TurtleMoveX > 2.07) {
+                forwardBool = false;
+                TurtleRotateY = 120;
+            } else if (TurtleMoveX < -4.98) {
+                forwardBool = true;
+                TurtleRotateY = -60;
+            }
+
+            if (forwardBool == true) {
+                TurtleMoveX += TurtleSpeedX * TurtleSpeedVar;
+                TurtleMoveZ -= TurtleSpeedZ * TurtleSpeedVar;
+            } else {
+                TurtleMoveX -= TurtleSpeedX * TurtleSpeedVar;
+                TurtleMoveZ += TurtleSpeedZ * TurtleSpeedVar;
+            }
+            main();
+        }
+        function speedTurtle() {
+            TurtleSpeedVar = document.getElementById("speedTurtle").value; 
+            document.getElementById("TurtleLabel").innerHTML = TurtleSpeedVar;
+        }
+
+
+        //Setting for turtle hand
+        var HandBool = true, movementBool = true, HandMove = -1, HandSpeed = 2;
+        var timerHand = setInterval(function(){ animateHandMoveLoop() }, 10);
+
+        function stopHand() {
+            if (HandBool == true) { HandBool = false; }
+            else { HandBool = true; }
+
+            if (HandBool == true) {
+                timerHand = setInterval(function(){ animateHandMoveLoop() }, 10);
+                document.getElementById("stopHand").value = "Stop Hand";
+            } else {
+                clearInterval(timerHand);
+                document.getElementById("stopHand").value = "Start Hand";
+            }
+        }
+
+        function animateHandMoveLoop() {
+            if (HandMove <= -1) { movementBool = true; }
+            else if (HandMove >= 1) { movementBool = false; }
+
+            if (movementBool == true) { HandMove += (HandSpeed * 0.0174533); }
+            else { HandMove -= (HandSpeed * 0.0174533); }
+
+            main();
+        }
+
+        function speedHand() {
+            HandSpeed = document.getElementById("speedHand").value; 
+            document.getElementById("HandLabel").innerHTML = HandSpeed;
+        }
+
+        //Setting for colourRGB (pong)
+        var shellColour = turtleColour, turtleColorBool = true;
+        function colorTurtle() { //colorParent2
+            if (turtleColorBool == true) { turtleColorBool = false; } 
+            else { turtleColorBool = true; }
+
+            alphaParent2(); 
+            main();
+        }
+
+        var handColor =turtleHandColour, handColorBool = true;
+        function colorHand() { //colorChild2
+            if (handColorBool == true) { handColorBool = false; } 
+            else { handColorBool = true; }
+
+            if (handColorBool == true) { handColor = turtleHandColour; }
+            else { handColor = brownColors; }
+            
+            main();
+        }
+
+        var alphaP2Value = 1;
+        function alphaParent2() {
+            alphaP2Value = document.getElementById("alphaParent2").value / 10; 
+            document.getElementById("aP2Label").innerHTML = parseFloat(alphaP2Value).toFixed(1);;
+
+            if (turtleColorBool == true) {
+                shellColour = [ // turtleColors
+                    [0.502, 1, 0.702, alphaP2Value],
+                    [0.502, 1, 0.702, alphaP2Value],
+                    [0.502, 1, 0.702, alphaP2Value],
+                    [0.502, 1, 0.702, alphaP2Value],
+                    [0.502, 1, 0.702, alphaP2Value],
+                    [0.502, 1, 0.702, alphaP2Value],
+                ];
+            } else {
+                shellColour = [ // StrawberryColors
+                    [1, 0, 0.376, alphaP2Value],    
+                    [1, 0, 0.376, alphaP2Value],   
+                    [1, 0, 0.376, alphaP2Value],   
+                    [1, 0, 0.376, alphaP2Value],   
+                    [1, 0, 0.376, alphaP2Value],   
+                    [1, 0, 0.376, alphaP2Value],   
+                ];
+            }
+
+            main();
+        } 
+        //####################end of setting turtle###################
+
+
+        //###############################################
+//Setting of jellyfish (Wong Jia Ying)
+//###############################################
+//adjust overall size of jellyfish
+let JellyFishOverallScale = 0.5;
+
+//movement Setting for jellyfish
+var JellyFishMoveX = 2,
+    JellyFishMoveY = 4,
+    JellyFishMoveZ = -2,
+    JellyFishSpeedX = 0.005,
+    JellyFishSpeedZ = 0.003,
+    JellyFishSpeedVar = 1;
+var JellyFishBool = true,
+    JellyFishForwardBool = true,
+    JellyFishRotateY = 0;
+var timerJellyFish = setInterval(function() {
+    animateJellyFishMoveLoop()
+}, 10);
+
+//Animation for jellyfish pulsing
+var JellyFishPulseBool = true,
+    JellyFishPulseDirection = true,
+    JellyFishPulseSpeed = 0.01;
+var JellyFishPulseScale = 1.0;
+var timerJellyFishPulse = setInterval(function() {
+    animateJellyFishPulseLoop()
+}, 20); // Faster animation for pulse
+
+
+function stopJellyFish() {
+    if (JellyFishBool == true) {
+        JellyFishBool = false;
+    } else {
+        JellyFishBool = true;
+    }
+
+    if (JellyFishBool == true) {
+        timerJellyFish = setInterval(function() {
+            animateJellyFishMoveLoop()
+        }, 10);
+        document.getElementById("stopJellyFish").value = "Stop JellyFish";
+    } else {
+        clearInterval(timerJellyFish);
+        document.getElementById("stopJellyFish").value = "Start JellyFish";
+    }
+}
+
+function animateJellyFishMoveLoop() {
+    if (JellyFishMoveX > 8.0) {
+        JellyFishForwardBool = false;
+        JellyFishRotateY = 180; //face the other way
+    } else if (JellyFishMoveX < 2.0) {
+        JellyFishForwardBool = true;
+        JellyFishRotateY = 0; //face original way
+    }
+
+    if (JellyFishForwardBool == true) {
+        JellyFishMoveX += JellyFishSpeedX * JellyFishSpeedVar;
+
+    } else {
+        JellyFishMoveX -= JellyFishSpeedX * JellyFishSpeedVar;
+
+    }
+    main();
+}
+
+function animateJellyFishPulseLoop() {
+    if (JellyFishPulseDirection == true) {
+        JellyFishPulseScale += JellyFishPulseSpeed;
+        if (JellyFishPulseScale >= 1.2) { // Max scale
+            JellyFishPulseDirection = false;
+        }
+    } else {
+        JellyFishPulseScale -= JellyFishPulseSpeed;
+        if (JellyFishPulseScale <= 0.9) { // Min scale
+            JellyFishPulseDirection = true;
+        }
+    }
+    main();
+}
+
+function speedJellyFish() {
+    JellyFishSpeedVar = document.getElementById("speedJellyFish").value;
+    document.getElementById("JellyFishLabel").innerHTML = JellyFishSpeedVar;
+}
+
+//Setting for JellyFish's tentacles animation
+var JellyFishTentacleBool = true,
+    JellyFishTentacleDirection = true,
+    JellyFishTentacleMove = 0,
+    JellyFishTentacleSpeed = 5;
+var timerJellyFishTentacle = setInterval(function() {
+    animateJellyFishTentacleLoop()
+}, 20); //sway speed
+
+function stopJellyFishTentacle() {
+    if (JellyFishTentacleBool == true) {
+        JellyFishTentacleBool = false;
+    } else {
+        JellyFishTentacleBool = true;
+    }
+
+    if (JellyFishTentacleBool == true) {
+        timerJellyFishTentacle = setInterval(function() {
+            animateJellyFishTentacleLoop()
+        }, 20);
+        document.getElementById("stopJellyFishTentacle").value = "Stop Tentacles";
+    } else {
+        clearInterval(timerJellyFishTentacle);
+        document.getElementById("stopJellyFishTentacle").value = "Start Tentacles";
+    }
+}
+
+function animateJellyFishTentacleLoop() {
+    // simple swaying motion for tentacles
+    if (JellyFishTentacleDirection == true) {
+        JellyFishTentacleMove += (JellyFishTentacleSpeed * 0.0174533); // Move forward (rotate)
+        if (JellyFishTentacleMove >= 30 * 0.0174533) { // Max angle (30 degrees)
+            JellyFishTentacleDirection = false;
+        }
+    } else {
+        JellyFishTentacleMove -= (JellyFishTentacleSpeed * 0.0174533); // Move backward (rotate)
+        if (JellyFishTentacleMove <= -30 * 0.0174533) { // Min angle (-30 degrees)
+            JellyFishTentacleDirection = true;
+        }
+    }
+    main();
+}
+
+function speedJellyFishTentacle() {
+    JellyFishTentacleSpeed = document.getElementById("speedJellyFishTentacle").value;
+    document.getElementById("TentacleLabel").innerHTML = JellyFishTentacleSpeed;
+}
+
+// Setting for JellyFish colourRGB (Wong Jia Ying)
+
+function colorJellyFishBody() {
+    JellyFishBodyColorBool = !JellyFishBodyColorBool; // Toggle the boolean
+    updateJellyFishColors(); // Re-calculate and apply colors with new body choice
+    main();
+}
+
+function colorJellyFishTentacle() {
+    JellyfishTentacleColorBool = !JellyfishTentacleColorBool; // Toggle the boolean
+    updateJellyFishColors(); // Re-calculate and apply colors with new tentacle choice
+    main();
+}
+
+function alphaJellyFishBody() { // This function is named after the body, but now controls global alpha
+    alphaJellyFishValue = document.getElementById("alphaJellyFish").value / 10;
+    document.getElementById("alphaJellyFishLabel").innerHTML = parseFloat(alphaJellyFishValue).toFixed(1);
+    updateJellyFishColors(); // Re-calculate and apply colors with updated alpha
+    main();
+}
+
+// Initial call to set colors with default alpha when the script loads
+updateJellyFishColors();
+
+//################## end setting of jellyfish (wong jia ying) ###################
+
+
+        //###############################################
+        //Setting of Fish Group (wong jia ying)
+        //###############################################
+        //adjust overall size of fish
+        let FishOverallScale = 0.7;
+
+        // Individual offsets for each fish relative to the group's center
+        var Fish1OffsetX = -1.5, Fish1OffsetZ = 0;
+        var Fish2OffsetX = 1.0, Fish2OffsetZ = -0.5;
+        var Fish3OffsetX = 0, Fish3OffsetZ = 1.5;
+        var Fish4OffsetX = -0.5, Fish4OffsetZ = -1.0;
+
+        // Movement settings for the entire fish group
+        var GroupMoveX = -12, GroupMoveZ = 2, GroupSpeedX = 0.05, GroupSpeedZ = 0.002;
+        var GroupBool = true, GroupForwardDirection = true, GroupRotateY = 90; // Initial rotation for the group
+
+        var timerFishGroup = setInterval(function() {
+            animateFishGroupMoveLoop();
+        }, 10);
+
+        function stopFish() { // Renamed from stopFishGroup for clarity with HTML button
+            if (GroupBool == true) {
+                GroupBool = false;
+            } else {
+                GroupBool = true;
+            }
+
+            if (GroupBool == true) {
+                timerFishGroup = setInterval(function() {
+                    animateFishGroupMoveLoop();
+                }, 10);
+                document.getElementById("stopFish").value = "Stop Fish";
+            } else {
+                clearInterval(timerFishGroup);
+                document.getElementById("stopFish").value = "Start Fish";
+            }
+        }
+
+        function animateFishGroupMoveLoop() {
+            // Determine the group's direction based on its primary movement axis (e.g., X-axis)
+            // This logic ensures the whole group turns together
+            if (GroupMoveX > 5.0) { // Max boundary
+                GroupForwardDirection = false;
+                GroupRotateY = -90; // Face left when moving left (along -X)
+            } else if (GroupMoveX < -5.0) { // Min boundary
+                GroupForwardDirection = true;
+                GroupRotateY = 90; // Face right when moving right (along +X)
+            }
+
+            // Update group position
+            if (GroupForwardDirection == true) {
+                GroupMoveX += GroupSpeedX;
+                GroupMoveZ += GroupSpeedZ;
+            } else {
+                GroupMoveX -= GroupSpeedX;
+                GroupMoveZ -= GroupSpeedZ;
+            }
+
+            main(); // Redraw the scene
+        }
+
+        // Tail Wagging Animation for the fish
+        var TailWagBool = true, TailWagDirection = true, TailWagMove = 0, TailWagSpeed = 5;
+        var timerTailWag = setInterval(function() { animateTailWagLoop() }, 50); // Slower wag for realism
+
+        function animateTailWagLoop() {
+            if (TailWagDirection == true) {
+                TailWagMove += (TailWagSpeed * 0.0174533); // Move forward (rotate)
+                if (TailWagMove >= 15 * 0.0174533) { // Max angle (15 degrees)
+                    TailWagDirection = false;
+                }
+            } else {
+                TailWagMove -= (TailWagSpeed * 0.0174533); // Move backward (rotate)
+                if (TailWagMove <= -15 * 0.0174533) { // Min angle (-15 degrees)
+                    TailWagDirection = true;
+                }
+            }
+            main(); // Redraw the scene with updated tail position
+        }
+
+
+        //Setting for Fish colourRGB (wong jia ying)
+        var fishBodyColour = fishBlueColor; // Default color
+        var fishColorToggleBool = true; // For toggling between two colors
+
+        function colorFish() {
+            if (fishColorToggleBool == true) {
+                fishColorToggleBool = false;
+            } else {
+                fishColorToggleBool = true;
+            }
+            // Call alpha function to update color based on new bool state
+            alphaFishBody();
+            main();
+        }
+
+        var alphaFishValue = 1;
+
+        function alphaFishBody() {
+            alphaFishValue = document.getElementById("alphaFish").value / 10;
+            document.getElementById("FishAlphaLabel").innerHTML = parseFloat(alphaFishValue).toFixed(1);
+
+            if (fishColorToggleBool == true) {
+                fishBodyColour = [ // Blue
+                    [0.0, 0.5, 1.0, alphaFishValue],
+                    [0.0, 0.5, 1.0, alphaFishValue],
+                    [0.0, 0.5, 1.0, alphaFishValue],
+                    [0.0, 0.5, 1.0, alphaFishValue],
+                    [0.0, 0.5, 1.0, alphaFishValue],
+                    [0.0, 0.5, 1.0, alphaFishValue],
+                ];
+            } else {
+                fishBodyColour = [ // Green
+                    [0.2, 0.8, 0.4, alphaFishValue],
+                    [0.2, 0.8, 0.4, alphaFishValue],
+                    [0.2, 0.8, 0.4, alphaFishValue],
+                    [0.2, 0.8, 0.4, alphaFishValue],
+                    [0.2, 0.8, 0.4, alphaFishValue],
+                    [0.2, 0.8, 0.4, alphaFishValue],
+                ];
+            }
+            main();
+        }
+        //################## end setting of Fish (wong jia ying) ###################
+
+
+        // ###################################################### //
+        // Setting Seahorse (TIFFANY)
+        // ###################################################### //
+
+        //movement Setting
+        var seahorseHeadX = -6,
+            seahorseHeadY = 5,
+            seahorseHeadZ = -3;
+        var seahorseSpeed = 0.008,
+            direction = 1; // 1 for moving right, -1 for moving left
+        var seahorseSpeedY = 0.05,
+            directionY = 1; // 1 for moving up, -1 for moving down
+        var SeahorseSpeedVar = 1; // Controlled by the main speed slider
+        var SeahorseBool = true; // Controls overall seahorse movement
+        var timerSeahorse = setInterval(function() {
+            seahorseHeadMove();
+        }, 10);
+
+        // Tail segments animation settings
+        var seahorseTail2Rotate = 0;
+        var seahorseTail2RotationSpeed = 0.05;
+        var seahorseTail2Direction = 1;
+
+        var seahorseTail3Rotate = 0;
+        var seahorseTail3RotationSpeed = 0.07;
+        var seahorseTail3Direction = 1;
+
+        // Fin animation settings
+        var seahorseFin1OffsetX = 0;
+        var seahorseFin1Speed = 0.02;
+        var seahorseFin1Direction = 1;
+
+        var seahorseFin2OffsetX = 0;
+        var seahorseFin2Speed = 0.03;
+        var seahorseFin2Direction = -1;
+
+        // Child (Tail) animation controls
+        var seahorseTailAnimationBool = true; // Controls tail wagging animation
+        var seahorseTailSpeedVar = 1; // Controlled by the child speed slider
+        var timerSeahorseTail = setInterval(function() {
+            animateSeahorseTailLoop();
+        }, 20); // Separate timer for tail animation
+
+        function stopSeahorse() {
+            if (SeahorseBool == true) {
+                SeahorseBool = false;
+            } else {
+                SeahorseBool = true;
+            }
+
+            if (SeahorseBool == true) {
+                timerSeahorse = setInterval(function() {
+                    seahorseHeadMove();
+                }, 10); 
+                document.getElementById("stopSeahorse").value = "Stop Seahorse";
+            } else {
+                clearInterval(timerSeahorse);
+                document.getElementById("stopSeahorse").value = "Start Seahorse";
+            }
+        }
+
+        function speedSeahorse() {
+            SeahorseSpeedVar = document.getElementById("speedSeahorse").value;
+            document.getElementById("sP3Label").innerHTML = SeahorseSpeedVar; 
+        }
+
+        function stopChild3() {
+            if (seahorseTailAnimationBool == true) {
+                seahorseTailAnimationBool = false;
+            } else {
+                seahorseTailAnimationBool = true;
+            }
+
+            if (seahorseTailAnimationBool == true) {
+                timerSeahorseTail = setInterval(function() {
+                    animateSeahorseTailLoop();
+                }, 20);
+                document.getElementById("stopChild3").value = "Stop Child 3";
+            } else {
+                clearInterval(timerSeahorseTail);
+                document.getElementById("stopChild3").value = "Start Child 3";
+            }
+        }
+
+        function speedChild3() { 
+            seahorseTailSpeedVar = document.getElementById("speedChild3").value;
+            document.getElementById("sC3Label").innerHTML = seahorseTailSpeedVar;
+        }
+
+
+        function seahorseHeadMove() {
+            // Update the seahorse's X and Y position, affected by main speed slider
+            seahorseHeadX += (seahorseSpeed * direction) * SeahorseSpeedVar;
+            if (seahorseHeadX > 4 || seahorseHeadX < -4) {
+                direction *= -1; // Reverse X direction
+            }
+
+            seahorseHeadY += (seahorseSpeedY * directionY) * SeahorseSpeedVar;
+            if (seahorseHeadY > 6 || seahorseHeadY < 3.5) { 
+                directionY *= -1; // Reverse Y direction
+            }
+
+            // Fin 1 animation (independent of tail animation bool)
+            seahorseFin1OffsetX += seahorseFin1Speed * seahorseFin1Direction;
+            if (seahorseFin1OffsetX > 0.2 || seahorseFin1OffsetX < 0) { 
+                seahorseFin1Direction *= -1;
+            }
+
+            // Fin 2 animation (independent of tail animation bool)
+            seahorseFin2OffsetX += seahorseFin2Speed * seahorseFin2Direction;
+            if (seahorseFin2OffsetX > 0.2 || seahorseFin2OffsetX < 0) { 
+                seahorseFin2Direction *= -1;
+            }
+
+            main(); // Redraw the scene
+        }
+
+        function animateSeahorseTailLoop() {
+            // Tail Segment 2 rotation, affected by child speed slider
+            seahorseTail2Rotate += (seahorseTail2RotationSpeed * seahorseTail2Direction) * seahorseTailSpeedVar;
+            if (seahorseTail2Rotate > 0.4 || seahorseTail2Rotate < -0.4) { // Rotate within a range (radians)
+                seahorseTail2Direction *= -1;
+            }
+
+            // Tail Segment 3 rotation, affected by child speed slider
+            seahorseTail3Rotate += (seahorseTail3RotationSpeed * seahorseTail3Direction) * seahorseTailSpeedVar;
+            if (seahorseTail3Rotate > 0.6 || seahorseTail3Rotate < -0.6) { // Rotate within a range (radians)
+                seahorseTail3Direction *= -1;
+            }
+
+            main(); // Redraw the scene
+        }
+
+
+        // --- Setting for colourRGB (TIFFANY) ---
+        var shColorBool = true; // For toggling main seahorse colors (orange/blue)
+        var shBodyColorBool = true; // For toggling body/nose colors (green/brown)
+
+        function colorSeahorse() { // Toggles Head, Tail 1, Tail 2, Tail 3, and Fins
+            if (shColorBool == true) {
+                shColorBool = false;
+            } else {
+                shColorBool = true;
+            }
+            // Update colors based on toggle, then apply alpha
+            updateSeahorseColors();
+            main();
+        }
+
+        function colorSeahorseBody() { // Toggles Body and Nose
+            if (shBodyColorBool == true) {
+                shBodyColorBool = false;
+            } else {
+                shBodyColorBool = true;
+            }
+            // Update colors based on toggle, then apply alpha
+            updateSeahorseColors();
+            main();
+        }
+
+        var alphaP3Value = 1; // Initial alpha value for the slider
+
+        function alphaParent3() {
+            alphaP3Value = document.getElementById("alphaParent3").value / 10;
+            document.getElementById("aP3Label").innerHTML = parseFloat(alphaP3Value).toFixed(1);
+
+            // Update all colors with the new alpha
+            updateSeahorseColors();
+            main();
+        }
+
+        function updateSeahorseColors() {
+            let currentHeadBase = shColorBool ? seahorseOrangeColor : seahorseBlueColor;
+            let currentBodyBase = shBodyColorBool ? seahorseGreenColor : turtleHandColour;
+            let currentTailBase = shColorBool ? seahorseOrangeColor : seahorseBlueColor;
+            let currentFinBase = seahorsePinkColor; 
+
+            seahorseHeadColour = currentHeadBase.map(color => [...color.slice(0, 3), alphaP3Value]);
+            seahorseBodyColour = currentBodyBase.map(color => [...color.slice(0, 3), alphaP3Value]);
+            seahorseTailColour = currentTailBase.map(color => [...color.slice(0, 3), alphaP3Value]);
+            
+            seahorsePinkColor.forEach((color, i) => seahorsePinkColor[i][3] = alphaP3Value); 
+        }
+
+        updateSeahorseColors();
+
+
+    </script>
+    <style>
+        .sceneLabel {
+            background-color: #e1e1e1;
+            padding: 7px 10px 7px 10px; 
+            margin: 7px 5px 0px 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+            -webkit-border-radius: 5px;
+            display: inline-block;
+            width: auto;
+        }
+        .objLabel {
+            background-color: #e1e1e1;
+            padding: 7px 10px 7px 10px; 
+            margin: 5px 5px 15px 5px;
+            font-size: 0.8em;
+            font-weight: bold;
+            -webkit-border-radius: 5px;
+            display: inline-block;
+            width: auto;
+        }
+        td { font-size: 0.9em; }
+    </style>
+</head>
+
+<body style="font-family: Arial, Helvetica, sans-serif; text-align: center; font-size: 0.9em;">
+    <div style="padding: 10px 0px 5px 0px;">
+        <div style="padding-bottom:7px;">Drag mouse inside canvas to rotate ALL OBJECTS on x-axis and y-axis</div>
+        <input type="button" id="resetBtn" value="Reset rotation" onclick="resetRotation()">
+        <br><div class="sceneLabel">Forest scene: Turtle, JellyFish, SeaHorse and Submarine</div>
+    </div>
+
+    <canvas id="glCanvas" width="640" height="480"></canvas>
+
+    <table width="640" cellpadding="0" cellspacing="5" border="0" align="center">
+        <tr><td colspan="2" align="center" style="padding: 5px;">
+            <b>CAMERA & PROJECTION</b>&nbsp;&nbsp;
+            <input type="button" id="resetCamBtn" value="Reset camera" onclick="resetCamera()">
+        </td></tr>
+        <tr>
+            <td width="30%" align="right">Field of view: <span id="c1Label">45&deg;</span></td>
+            <td><input oninput="changeC1value()" id="c1Value" type="range" min="0" max="180" value="45" style="width: 100%"></td>
+        </tr>
+        <tr>
+            <td width="" align="right">Rotate-x (camera): <span id="c2Label">0&deg;</span></td>
+            <td><input oninput="changeC2value()" id="c2Value" type="range" min="-180" max="180" value="0" style="width: 100%"></td>
+        </tr>
+        <tr>
+            <td width="" align="right">Rotate-y (camera): <span id="c4Label">0&deg;</span></td>
+            <td><input oninput="changeC4value()" id="c4Value" type="range" min="-180" max="180" value="0" style="width: 100%"></td>
+        </tr>
+        <tr>
+            <td width="" align="right">Rotate-z (camera): <span id="c5Label">0&deg;</span></td>
+            <td><input oninput="changeC5value()" id="c5Value" type="range" min="-180" max="180" value="0" style="width: 100%"></td>
+        </tr>
+        <tr>
+            <td width="" align="right">z-Position (camera): <span id="c3Label">0</span></td>
+            <td><input oninput="changeC3value()" id="c3Value" type="range" min="-50" max="100" value="0" style="width: 100%"></td>
+        </tr>
+
+        <tr><td colspan="2" align="center" style="padding: 5px;">
+        <div><b>Z-NEAR & Z-FAR</b>&nbsp;&nbsp; </div>
+        </td></tr>
+
+        <tr>
+            <td width="" align="right">z-Near (camera): <span id="c6Label">0.1</span></td>
+            <td><input oninput="changeC6value()" id="c6Value" type="range" min="1" max="500" value="1" style="width: 100%"></td>
+        </tr>
+        <tr>
+            <td width="" align="right">z-Far (camera): <span id="c7Label">50</span></td>
+            <td><input oninput="changeC7value()" id="c7Value" type="range" min="1" max="500" value="500" style="width: 100%"></td>
+        </tr>
+        <tr><td colspan="2"><hr></td></tr>
+
+    </table>
+    <div><b>OBJECT TRANSFORMATION & COLOR</b></div>
+    <table width="640" cellpadding="0" cellspacing="5" border="0" align="center">  
+        <tr>
+            <td align="center">
+                <div class="objLabel">CD24067 CHIN JIA YIN: Submarine</div><br>
+                <!-- parent -->
+                <input type="button" id="stopSubmarine" value="Stop Submarine" onclick="stopSubmarine()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="speedsubLabel">1</span> ]
+                <br><input oninput="speedSubmarine()" id="speedSubmarine" type="range" min="1" max="10" value="1" style="width: 80%">
+                <hr width="80%">
+                <!-- child 1 -->
+                <input type="button" id="stopProp" value="Stop Propeller" onclick="stopProp()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="sC1Label">30</span> ]
+                <br><input oninput="speedProp()" id="speedProp" type="range" min="1" max="100" value="30" style="width: 80%">
+                <hr width="80%">
+                <!-- child 2 -->
+                <input type="button" id="stopTube" value="Stop Periscope" onclick="stopTube()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="TubeLabel">30</span> ]
+                <br><input oninput="speedTube()" id="speedTube" type="range" min="1" max="100" value="30" style="width: 80%">
+                <hr width="80%">
+                <!-- color -->
+                RGB[A: <span id="aPSubLabel">1.0</span>]&nbsp; 
+                <input type="button" id="colorSub" value="Sub" onclick="colorSub()" style="margin-bottom: 5px;">
+                <input type="button" id="colorSub2" value="Propeller" onclick="colorSub2()" style="margin-bottom: 5px;">
+                <input type="button" id="colorSub3" value="Mirror" onclick="colorSub3()" style="margin-bottom: 5px;">
+                <input type="button" id="colorSub4" value="Frame" onclick="colorSub4()" style="margin-bottom: 5px;">
+                <br><input oninput="alphaSubmarine()" id="alphaSubmarine" type="range" min="0" max="10" value="10" style="width: 80%">
+            </td>
+
+            <td align="center">
+                <div class="objLabel">CD24041 Pong Jia Ni: Turtle</div><br>
+                <!-- parent -->
+                <input type="button" id="stopTurtle" value="Stop Turtle" onclick="stopTurtle()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="TurtleLabel">1</span> ]
+                <br><input oninput="speedTurtle()" id="speedTurtle" type="range" min="1" max="10" value="1" style="width: 80%">
+                <hr width="80%">
+                <!-- child 1 -->
+                <input type="button" id="stopHand" value="StopHand" onclick="stopHand()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="HandLabel">1</span> ]
+                <br><input oninput="speedHand()" id="speedHand" type="range" min="1" max="10" value="1" style="width: 80%">
+                <hr width="80%">
+                <!-- color -->
+                RGB[A: <span id="aP2Label">1.0</span>]&nbsp; 
+                <input type="button" id="colorTurtle" value="Turtle" onclick="colorTurtle()" style="margin-bottom: 5px;">
+                <input type="button" id="colorHand" value="Hand" onclick="colorHand()" style="margin-bottom: 5px;">
+                <br><input oninput="alphaParent2()" id="alphaParent2" type="range" min="0" max="10" value="10" style="width: 80%">
+            </td>
+
+            <td align="center">
+                <div class="objLabel">CD24051 WONG JIA YING: JellyFish</div><br>
+                <!--parent-->
+                <input type="button" id="stopJellyFish" value="Stop JellyFish" onclick="stopJellyFish()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="JellyFishLabel">1</span> ]
+                <br><input oninput="speedJellyFish()" id="speedJellyFish" type="range" min="1" max="10" value="1" style="width: 80%">
+                <hr width="80%">
+                <!--child -->
+                <input type="button" id="stopJellyFishTentacle" value="Stop Tentacles" onclick="stopJellyFishTentacle()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="TentacleLabel">1</span> ]
+                <br><input oninput="speedJellyFishTentacle()" id="speedJellyFishTentacle" type="range" min="1" max="10" value="1" style="width: 80%">
+                <hr width="80%">
+                <!--colour-->
+                RGB[A: <span id="alphaJellyFishLabel">1.0</span>]&nbsp; 
+                <input type="button" id="colorJellyFishBody" value="JellyFish Body" onclick="colorJellyFishBody()" style="margin-bottom: 5px;">
+                <input type="button" id="colorJellyFishTentacle" value="Tentacles" onclick="colorJellyFishTentacle()" style="margin-bottom: 5px;">
+                <br><input oninput="alphaJellyFishBody()" id="alphaJellyFish" type="range" min="0" max="10" value="10" style="width: 80%">
+            </td> 
+
+            <td align="center">
+                <div class="objLabel">CD24051 Wong Jia Ying: Fish Group</div><br>
+                <input type="button" id="stopFish" value="Stop Fish" onclick="stopFish()" style="margin-bottom: 5px;">
+                <hr width="80%">
+                <input type="button" id="colorFish" value="Change Fish Color" onclick="colorFish()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="FishAlphaLabel">1.0</span> ]
+                <br><input oninput="alphaFishBody()" id="alphaFish" type="range" min="0" max="10" value="10" style="width: 80%">
+            </td>
+
+            <td align="center">
+                <div class="objLabel">CD24061 NAME: Tiffany Ng: Seahorse</div><br>
+                <!-- parent -->
+                <input type="button" id="stopSeahorse" value="Stop Seahorse" onclick="stopSeahorse()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="sP3Label">1</span> ]
+                <br><input oninput="speedSeahorse()" id="speedSeahorse" type="range" min="1" max="10" value="1" style="width: 80%">
+                <hr width="80%">
+                <!-- child 1 -->
+                <input type="button" id="stopChild3" value="Stop Tail" onclick="stopChild3()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="sC3Label">1</span> ]
+                <br><input oninput="speedChild3()" id="speedChild3" type="range" min="1" max="10" value="1" style="width: 80%">
+                <hr width="80%">
+                <!-- color -->
+                RGB[A: <span id="aP3Label">1.0</span>]&nbsp;
+                <input type="button" id="colorSeahorse" value="Seahorse" onclick="colorSeahorse()" style="margin-bottom: 5px;">
+                <input type="button" id="colorSeahorseBody" value="Body" onclick="colorSeahorseBody()" style="margin-bottom: 5px;">
+                <br><input oninput="alphaParent3()" id="alphaParent3" type="range" min="0" max="10" value="10" style="width: 80%">
+            </td>
+        </tr> 
+    </table>
+</body>
