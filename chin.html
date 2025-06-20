@@ -160,6 +160,7 @@
             mat4.scale(modelViewMatrix,modelViewMatrix,[10,0.1,10]);
             drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
 
             // Reset modelViewMatrix to draw another object
             modelViewMatrix = mat4.create(); 
@@ -168,6 +169,307 @@
             mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
             mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
 
+           
+            // ###################################################### //
+            //Draw spongebob house (pong JN)
+            // Reset modelViewMatrix to draw another object
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+            colorsBuffer = initBuffers(gl,positionsBox,SpongebobHouseColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[6,2.2,8]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[2,2.1,2]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //window1
+            colorsBuffer = initBuffers(gl,positionsBox,greenColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[0.7,0.5,-0.05]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.2,0.3,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //window2
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-6.5,-1,-0.05]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,0.8,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //pipeapple leaf1
+            colorsBuffer = initBuffers(gl,positionsBox,pipeappleLeafColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[5,4,0.5]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,6,0.2]);
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,30 *0.0174533);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-1,0.5,0.5]);
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,30 *0.0174533);
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,180 *0.0174533);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-3,-0.,1]);
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,75 *0.0174533);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //###############################################################
+            // Reset modelViewMatrix to draw another object (door have error)
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ);
+            
+            //draw door
+            colorsBuffer = initBuffers(gl,positionsBox,doorBlueColour);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[6.2,1,6]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.6,1,0.05]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //###############################################################
+            // Reset modelViewMatrix to draw another object (for Exhaust pipe)
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ);
+            //Draw Exhaust pipe
+            colorsBuffer = initBuffers(gl,positionsBox,doorBlueColour);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[3.5,3,8.3]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.2,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            mat4.translate(modelViewMatrix,modelViewMatrix,[-0.5,3,0]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,3,1]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Reset modelViewMatrix to draw another object 
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ);
+
+            //Draw Exhaust pipe
+            colorsBuffer = initBuffers(gl,positionsBox,pipeBlueColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[3.2,4.2,8.3]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.2,0.7]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            colorsBuffer = initBuffers(gl,positionsBox,pipePortColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[0,1,0]);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[0.5,0.2,0.5]);
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            //##########################################################//
+
+            // ###################################################### //
+            //Draw turtle - (PONG JN)
+            // Reset modelViewMatrix to draw another object
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ); 
+
+             //Draw middle shell (main)
+            colorsBuffer = initBuffers(gl,positionsBox,greyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[TurtleMoveX,4,TurtleMoveZ]); //coordinate
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,TurtleRotateY * 0.0174533);  
+            let TurtleMatrix =mat4.clone(modelViewMatrix);
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1,0.2,1]); //size
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // DRAW bottom shell
+            colorsBuffer = initBuffers(gl,positionsBox,shellColour);
+            mat4.translate(TurtleMatrix,TurtleMatrix,[0,-0.2,0]);
+            mat4.rotateY(TurtleMatrix,TurtleMatrix,90 * 0.0174533);  
+            mat4.scale(TurtleMatrix,TurtleMatrix,[0.90,0.05,1]);
+            drawScene(gl, programInfo, colorsBuffer, TurtleMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw top shell
+            let topShellMatrix = mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,shellColour);
+            mat4.translate(topShellMatrix,topShellMatrix,[0,1.5,0]);
+            mat4.rotateY(topShellMatrix,topShellMatrix,90 * 0.0174533);  
+            mat4.scale(topShellMatrix,topShellMatrix,[0.90,0.5,1]);
+            drawScene(gl, programInfo, colorsBuffer, topShellMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw turtle head
+            let HeadMatrix =mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,shellColour);
+            mat4.translate(HeadMatrix,HeadMatrix,[0,0,-0.5]);
+            mat4.scale(HeadMatrix,HeadMatrix,[0.5,0.5,1]);
+            drawScene(gl, programInfo, colorsBuffer, HeadMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw turtle left leg
+            let leftLegMatrix = mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,handColor)
+            mat4.translate(leftLegMatrix,leftLegMatrix,[-0.5,0,0.5]);
+            mat4.scale(leftLegMatrix,leftLegMatrix,[0.2,0.5,1]);
+            drawScene(gl, programInfo, colorsBuffer, leftLegMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw turtle right leg
+            let rightLegMatrix = mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,handColor)
+            mat4.translate(rightLegMatrix,rightLegMatrix,[-0.5,0,0.5]);
+            mat4.scale(rightLegMatrix,rightLegMatrix,[0.2,0.5,1]);
+            drawScene(gl, programInfo, colorsBuffer, rightLegMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw turtle left leg
+            let legMatrix = mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,handColor);
+            mat4.translate(legMatrix,legMatrix,[0.5,0,0.5]);
+            mat4.scale(legMatrix,legMatrix,[0.2,0.5,1]);
+            drawScene(gl, programInfo, colorsBuffer, legMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw  RIGHT hand bone
+            let handBoneMatrix =mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,handColor);
+            mat4.translate(handBoneMatrix,handBoneMatrix,[1.2,0,-0.5]);
+            mat4.scale(handBoneMatrix,handBoneMatrix,[0.5,0.5,0.2]);
+            mat4.rotateY(handBoneMatrix,handBoneMatrix, HandMove); 
+            drawScene(gl, programInfo, colorsBuffer, handBoneMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw right hand
+            colorsBuffer = initBuffers(gl,positionsBox,handColor);
+            mat4.translate(handBoneMatrix,handBoneMatrix,[1.3,0.8,0]);
+            mat4.rotateY(handBoneMatrix,handBoneMatrix,45* 0.0174533);
+            drawScene(gl, programInfo, colorsBuffer, handBoneMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //DRAW LEFT HAND bone
+            let leftBoneMatrix =mat4.clone(modelViewMatrix);
+            colorsBuffer = initBuffers(gl,positionsBox,handColor);
+            mat4.translate(leftBoneMatrix,leftBoneMatrix,[-1.2,0,-0.5]);
+            mat4.scale(leftBoneMatrix,leftBoneMatrix,[0.5,0.5,0.2]);
+            mat4.rotateY(leftBoneMatrix,leftBoneMatrix, -HandMove); 
+            drawScene(gl, programInfo, colorsBuffer, leftBoneMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //DRAW left hand
+            colorsBuffer = initBuffers(gl,positionsBox,handColor);
+            mat4.translate(leftBoneMatrix,leftBoneMatrix,[-1.1,0,-0.5]);
+            mat4.rotateY(leftBoneMatrix,leftBoneMatrix,45* 0.0174533);
+            drawScene(gl, programInfo, colorsBuffer, leftBoneMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //############end for pong's turtle ##################
+  
+
+
+            // ###################################################### //
+            // Draw jellyfish (Wong Jia Ying)
+
+            // Reset modelViewMatrix to draw another object
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ);
+
+            //Draw middle jellyfish bell(main)
+            colorsBuffer = initBuffers(gl,positionsBox,greyColors);
+            mat4.translate(modelViewMatrix,modelViewMatrix,[JellyFishMoveX,JellyFishMoveY,JellyFishMoveZ]); //Overall Jellyfish coordinate
+            mat4.scale(modelViewMatrix, modelViewMatrix, [JellyFishOverallScale,JellyFishOverallScale, JellyFishOverallScale] ); //Overall Jellyfish scale
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,JellyFishRotateY * 0.0174533);  
+            let JellyFishMainMatrix =mat4.clone(modelViewMatrix);  // Base for all parts relative to the jellyfish's position/rotation
+            mat4.scale(modelViewMatrix,modelViewMatrix,[1.5 *JellyFishPulseScale,1.0*JellyFishPulseScale,1.5*JellyFishPulseScale]); //size
+            drawScene(gl, programInfo, colorsBuffer, modelViewMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Draw Bottom of  jellyfish Bell
+            colorsBuffer = initBuffers(gl, positionsBox, JellyFishBodyColour); // Use the variable for dynamic color
+            let JellyFishBottomMatrix = mat4.clone(JellyFishMainMatrix); // Start from main jellyfish's base
+            mat4.translate(JellyFishBottomMatrix, JellyFishBottomMatrix, [0, -1.0 * JellyFishPulseScale, 0]); // Move down relative to the main bell
+            mat4.scale(JellyFishBottomMatrix, JellyFishBottomMatrix, [1.2 * JellyFishPulseScale, 0.3 * JellyFishPulseScale, 1.2 * JellyFishPulseScale]); // Wider, flatter bottom
+            drawScene(gl, programInfo, colorsBuffer, JellyFishBottomMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Draw Top of jellyfish Bell 
+            colorsBuffer = initBuffers(gl, positionsBox, JellyFishBodyColour); // Use the variable for dynamic color
+            let JellyFishTopMatrix = mat4.clone(JellyFishMainMatrix); // Start from main jellyfish's base
+            mat4.translate(JellyFishTopMatrix, JellyFishTopMatrix, [0, 1.0 * JellyFishPulseScale, 0]); // Move up relative to the main bell
+            mat4.scale(JellyFishTopMatrix, JellyFishTopMatrix, [0.8 * JellyFishPulseScale, 0.5 * JellyFishPulseScale, 0.8 * JellyFishPulseScale]); // Smaller, flatter top
+            drawScene(gl, programInfo, colorsBuffer, JellyFishTopMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Draw central oral arms
+            let OralArmMatrix = mat4.clone(JellyFishMainMatrix);
+            colorsBuffer = initBuffers(gl, positionsBox, JellyFishTentacleColour); // Use the variable for dynamic color
+            mat4.translate(OralArmMatrix, OralArmMatrix, [0, -1.5 * JellyFishPulseScale, 0]); // Position below the bell
+            mat4.scale(OralArmMatrix, OralArmMatrix, [0.5 * JellyFishPulseScale, 2.0 * JellyFishPulseScale, 0.5 * JellyFishPulseScale]); // Stretched vertically
+            drawScene(gl, programInfo, colorsBuffer, OralArmMatrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Draw tentacles
+            // Tentacle 1 (Front Left)
+            let Tentacle1Matrix = mat4.clone(JellyFishMainMatrix);
+            colorsBuffer = initBuffers(gl, positionsBox, JellyFishTentacleColour); // Use the variable for dynamic color
+            mat4.translate(Tentacle1Matrix, Tentacle1Matrix, [-0.8 * JellyFishPulseScale, -1.8 * JellyFishPulseScale, 0.8 * JellyFishPulseScale]); // Position below bell, offset
+            mat4.rotateY(Tentacle1Matrix, Tentacle1Matrix, JellyFishTentacleMove ); // Animation for sway
+            mat4.scale(Tentacle1Matrix, Tentacle1Matrix, [0.2 * JellyFishPulseScale, 3.0 * JellyFishPulseScale, 0.2 * JellyFishPulseScale]); // Thin and long
+            drawScene(gl, programInfo, colorsBuffer, Tentacle1Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            
+            // Tentacle 2 (Front Right)
+            let Tentacle2Matrix = mat4.clone(JellyFishMainMatrix);
+            colorsBuffer = initBuffers(gl, positionsBox, JellyFishTentacleColour); // Use the variable for dynamic color
+            mat4.translate(Tentacle2Matrix, Tentacle2Matrix, [0.8 * JellyFishPulseScale, -1.8 * JellyFishPulseScale, 0.8 * JellyFishPulseScale]); // Position below bell, offset
+            mat4.rotateY(Tentacle2Matrix, Tentacle2Matrix, JellyFishTentacleMove ); // Opposite animation for sway
+            mat4.scale(Tentacle2Matrix, Tentacle2Matrix, [0.2 * JellyFishPulseScale, 3.0 * JellyFishPulseScale, 0.2 * JellyFishPulseScale]); // Thin and long
+            drawScene(gl, programInfo, colorsBuffer, Tentacle2Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            // Tentacle 3 (Back Left)
+            let Tentacle3Matrix = mat4.clone(JellyFishMainMatrix);
+            colorsBuffer = initBuffers(gl, positionsBox, JellyFishTentacleColour); // Use the variable for dynamic color
+            mat4.translate(Tentacle3Matrix, Tentacle3Matrix, [-0.8 * JellyFishPulseScale, -1.8 * JellyFishPulseScale, -0.8 * JellyFishPulseScale]); // Position below bell, offset
+            mat4.rotateY(Tentacle3Matrix, Tentacle3Matrix, JellyFishTentacleMove); // Animation for sway
+            mat4.scale(Tentacle3Matrix, Tentacle3Matrix, [0.2 * JellyFishPulseScale, 3.0 * JellyFishPulseScale, 0.2 * JellyFishPulseScale]); // Thin and long
+            drawScene(gl, programInfo, colorsBuffer, Tentacle3Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //Tentacle 4 (Back Right)
+            let Tentacle4Matrix = mat4.clone(JellyFishMainMatrix);
+            colorsBuffer = initBuffers(gl, positionsBox, JellyFishTentacleColour); // Use the variable for dynamic color
+            mat4.translate(Tentacle4Matrix, Tentacle4Matrix, [0.8 * JellyFishPulseScale, -1.8 * JellyFishPulseScale, -0.8 * JellyFishPulseScale]); // Position below bell, offset
+            mat4.rotateY(Tentacle4Matrix, Tentacle4Matrix, JellyFishTentacleMove ); // Opposite animation for sway
+            mat4.scale(Tentacle4Matrix, Tentacle4Matrix, [0.2 * JellyFishPulseScale, 3.0 * JellyFishPulseScale, 0.2 * JellyFishPulseScale]); // Thin and long
+            drawScene(gl, programInfo, colorsBuffer, Tentacle4Matrix, projectionMatrix);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            //############  end for jellyfish (Wong Jia Ying) ################# //
+
+
+
+            // ###################################################### //
+            // STONE & SEAWEED (Chin Jia Yin)
+            // ###################################################### //
+            
+            // Reset modelViewMatrix to draw another object
+            modelViewMatrix = mat4.create(); 
+            // Drag mouse to rotateX & rotateY
+            mat4.rotateX(modelViewMatrix,modelViewMatrix,rotateX);   
+            mat4.rotateY(modelViewMatrix,modelViewMatrix,rotateY);  
+            mat4.rotateZ(modelViewMatrix,modelViewMatrix,rotateZ);
             // DRAW STONE
             // ###################################################### //
 
@@ -1395,7 +1697,7 @@
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
 
-            // DRAW TUBE 
+            // DRAW PERISCOPE
 
             colorsBuffer = initBuffers(gl,positionsBox,SubColor);
             mat4.translate(TubeMatrix,TubeMatrix,[0,1.1,0.25]);
@@ -1660,6 +1962,102 @@
             [0.431, 0.6, 0.31, 1.0],
             [0.431, 0.6, 0.31, 1.0],
         ];
+        var SpongebobHouseColors = [
+            [1, 1, 0, 1.0],
+            [1, 1, 0, 1.0],
+            [1, 1, 0, 1.0],
+            [1, 1, 0, 1.0],
+            [1, 1, 0, 1.0],
+            [1, 1, 0, 1.0],
+        ];
+
+        var pipeappleLeafColors = [
+            [0.216, 1, 0, 1.0],
+            [0.216, 1, 0, 1.0],
+            [0.216, 1, 0, 1.0],
+            [0.216, 1, 0, 1.0],
+            [0.216, 1, 0, 1.0],
+            [0.216, 1, 0, 1.0],
+        ];
+
+        var doorBlueColour = [
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+            [0.773, 0.89, 0.98, 1.0],
+        ]
+        var pipeBlueColors = [
+            [0.678, 0.855, 0.878, 1.0],
+            [0.678, 0.855, 0.878, 1.0],
+            [0.678, 0.855, 0.878, 1.0],
+            [0.678, 0.855, 0.878, 1.0],
+            [0.678, 0.855, 0.878, 1.0],
+            [0.678, 0.855, 0.878, 1.0],
+        ]
+        var pipePortColors = [
+            [0.21, 0.21, 0.21, 1.0],
+            [0.21, 0.21, 0.21, 1.0],
+            [0.21, 0.21, 0.21, 1.0],
+            [0.21, 0.21, 0.21, 1.0],
+            [0.21, 0.21, 0.21, 1.0],
+            [0.21, 0.21, 0.21, 1.0],
+        ]
+        var strawberryColor = [
+            [1, 0, 0.376, 1.0],
+            [1, 0, 0.376, 1.0],
+            [1, 0, 0.376, 1.0],
+            [1, 0, 0.376, 1.0],
+            [1, 0, 0.376, 1.0],
+            [1, 0, 0.376, 1.0],
+        ]
+        var turtleColour = [
+            [0.502, 1, 0.702, 1.0],
+            [0.502, 1, 0.702, 1.0],
+            [0.502, 1, 0.702, 1.0],
+            [0.502, 1, 0.702, 1.0],
+            [0.502, 1, 0.702, 1.0],
+            [0.502, 1, 0.702, 1.0],
+        ]
+        var turtleHandColour = [
+            [0.557, 0.612, 0.443, 1.0],
+            [0.557, 0.612, 0.443, 1.0],
+            [0.557, 0.612, 0.443, 1.0],
+            [0.557, 0.612, 0.443, 1.0],
+            [0.557, 0.612, 0.443, 1.0],
+            [0.557, 0.612, 0.443, 1.0],
+        ]
+
+
+        // Define new colors for the Jellyfish
+        const JellyFishBodyColor = [
+            [0.7, 0.9, 1.0, 0.8], // Light Blue, translucent
+            [0.7, 0.9, 1.0, 0.8],
+            [0.7, 0.9, 1.0, 0.8],
+            [0.7, 0.9, 1.0, 0.8],
+            [0.7, 0.9, 1.0, 0.8],
+            [0.7, 0.9, 1.0, 0.8],
+        ];
+
+        const JellyFishTentacleColor = [
+            [1.0, 0.7, 0.8, 0.7], // Pinkish, translucent
+            [1.0, 0.7, 0.8, 0.7],
+            [1.0, 0.7, 0.8, 0.7],
+            [1.0, 0.7, 0.8, 0.7],
+            [1.0, 0.7, 0.8, 0.7],
+            [1.0, 0.7, 0.8, 0.7],
+        ];
+
+        const darkJellyFishTentacleColor = [
+            [0.8, 0.5, 0.6, 0.7], // Darker Pinkish, translucent
+            [0.8, 0.5, 0.6, 0.7],
+            [0.8, 0.5, 0.6, 0.7],
+            [0.8, 0.5, 0.6, 0.7],
+            [0.8, 0.5, 0.6, 0.7],
+            [0.8, 0.5, 0.6, 0.7],
+        ];
+
 
         var rotateX = 0, rotateY = 0, rotateZ = 0;
 
@@ -2086,20 +2484,20 @@
             document.getElementById("speedsubLabel").innerHTML = SubSpeed;
         }
 
-        // Turbine
+        // Propeller
         var SubRotorBool = true, rotorMove = 0, rotorSpeed = 50;;
         var timer2 = setInterval(function(){ animateRotorMoveLoop() }, 10);
 
-        function stopChild1() {
+        function stopProp() {
             if (SubRotorBool == true) { SubRotorBool = false; }
             else { SubRotorBool = true; }
 
             if (SubRotorBool == true) {
                 timer2 = setInterval(function(){ animateRotorMoveLoop() }, 10);
-                document.getElementById("stopChild1").value = "Stop Child 1";
+                document.getElementById("stopProp").value = "Stop Propeller";
             } else {
                 clearInterval(timer2);
-                document.getElementById("stopChild1").value = "Start Child 1";
+                document.getElementById("stopProp").value = "Start Propeller";
             }
         }
 
@@ -2109,8 +2507,8 @@
             main();
         }
 
-        function speedChild1() {
-            rotorSpeed = document.getElementById("speedChild1").value; 
+        function speedProp() {
+            rotorSpeed = document.getElementById("speedProp").value; 
             document.getElementById("sC1Label").innerHTML = rotorSpeed;
         }
 
@@ -2125,10 +2523,10 @@
 
             if (TubeBool == true) {
                 timerTube = setInterval(function(){ animateTubeMoveLoop() }, 10);
-                document.getElementById("stopTube").value = "Stop Tube";
+                document.getElementById("stopTube").value = "Stop Periscope";
             } else {
                 clearInterval(timerTube);
-                document.getElementById("stopTube").value = "Start Tube";
+                document.getElementById("stopTube").value = "Start Periscope";
             }
         }
 
@@ -2154,7 +2552,7 @@
             if (SubColorBool == true) { SubColorBool = false; } 
             else { SubColorBool = true; }
 
-            alphaParent1(); 
+            alphaSubmarine(); 
             main();
         }
 
@@ -2164,7 +2562,7 @@
             else { rotorColorBool = true; }
 
             if (rotorColorBool == true) { rotorColor = darkGreyColors; }
-            else { rotorColor = greenColors; }
+            else { rotorColor = strawberryColor; }
 
             main();
         }
@@ -2175,7 +2573,7 @@
             else { MirrorColorBool = true; }
 
             if (MirrorColorBool == true) { MirrorColor = lightblueColors; }
-            else { MirrorColor = greyColors; }
+            else { MirrorColor = strawberryColor; }
 
             main();
         }
@@ -2186,133 +2584,133 @@
             else { frameColorBool = true; }
 
             if (frameColorBool == true) { FrameColor = darkblueColors; }
-            else { FrameColor = greyColors; }
+            else { FrameColor = strawberryColor; }
 
             main();
         }
 
 
         var alphaP1Value = 1;
-        function alphaParent1() {
-            alphaP1Value = document.getElementById("alphaParent1").value / 10; 
-            document.getElementById("aP1Label").innerHTML = parseFloat(alphaP1Value).toFixed(1);;
+        function alphaSubmarine() {
+            alphaP1Value = document.getElementById("alphaSubmarine").value / 10; 
+            document.getElementById("aPSubLabel").innerHTML = parseFloat(alphaP1Value).toFixed(1);;
 
             if (SubColorBool == true) {
-                SubColor = [ // pinkColors
-                    [0.990, 0, 0.5, alphaP1Value],    
-                    [0.990, 0, 0.5, alphaP1Value],    
-                    [0.990, 0, 0.5, alphaP1Value],    
-                    [0.990, 0, 0.5, alphaP1Value],    
-                    [0.990, 0, 0.5, alphaP1Value],    
-                    [0.990, 0, 0.5, alphaP1Value],    
+                SubColor = [ // bluegreyColors
+                    [0.592, 0.655, 0.82, alphaP1Value],    
+                    [0.592, 0.655, 0.82, alphaP1Value],    
+                    [0.592, 0.655, 0.82, alphaP1Value],    
+                    [0.592, 0.655, 0.82, alphaP1Value],    
+                    [0.592, 0.655, 0.82, alphaP1Value],    
+                    [0.592, 0.655, 0.82, alphaP1Value],    
                 ];
             } else { 
-                SubColor = [ // blueColors
-                    [0, 0, 1, alphaP1Value],    
-                    [0, 0, 1, alphaP1Value],    
-                    [0, 0, 1, alphaP1Value],    
-                    [0, 0, 1, alphaP1Value],    
-                    [0, 0, 1, alphaP1Value],    
-                    [0, 0, 1, alphaP1Value],     
+                SubColor = [ // strawberryColor
+                    [1, 0, 0.376, alphaP1Value],    
+                    [1, 0, 0.376, alphaP1Value],    
+                    [1, 0, 0.376, alphaP1Value],    
+                    [1, 0, 0.376, alphaP1Value],    
+                    [1, 0, 0.376, alphaP1Value],    
+                    [1, 0, 0.376, alphaP1Value],    
                 ];
             }
 
             main();
         }
+        //################
+        //Setting Turtle//
+        //###############
+        //movement Setting for turtle
+            var TurtleMoveX = 0, TurtleMoveZ = 2.5, TurtleSpeedX = 0.005, TurtleSpeedZ = 0.003, TurtleSpeedVar = 1;
+            var TurtleBool = true, forwardBool = true, TurtleRotateY = -45;
+            var timerTurtle = setInterval(function(){ animateTurtleMoveLoop() }, 10);
 
-        // ########################################### //
-        // BOAT TRANSFORMATION & COLOR functions
-        // ########################################### //
+            function stopTurtle() {
+            if (TurtleBool == true) { TurtleBool = false; }
+            else { TurtleBool = true; }
 
-        var boatBool = true, forwardBool = true, boatRotateY = -60;
-        var boatMoveX = -6, boatMoveZ = 2.5, boatSpeedX = 0.005, boatSpeedZ = 0.003, boatSpeedVar = 1;
-        var timer3 = setInterval(function(){ animateBoatMoveLoop() }, 10);
-
-        function stopParent2() {
-            if (boatBool == true) { boatBool = false; }
-            else { boatBool = true; }
-
-            if (boatBool == true) {
-                timer3 = setInterval(function(){ animateBoatMoveLoop() }, 10);
-                document.getElementById("stopParent2").value = "Stop Parent 2";
+            if (TurtleBool == true) {
+                timerTurtle = setInterval(function(){ animateTurtleMoveLoop() }, 10);
+                document.getElementById("stopTurtle").value = "Stop Turtle";
             } else {
-                clearInterval(timer3);
-                document.getElementById("stopParent2").value = "Start Parent 2";
+                clearInterval(timerTurtle);
+                document.getElementById("stopTurtle").value = "Start Turtle";
             }
         }
-
-        function animateBoatMoveLoop() {
-            if (boatMoveX > 2.07) {
+        function animateTurtleMoveLoop() {
+            if (TurtleMoveX > 2.07) {
                 forwardBool = false;
-                boatRotateY = 120;
-            } else if (boatMoveX < -5.98) {
+                TurtleRotateY = 120;
+            } else if (TurtleMoveX < -4.98) {
                 forwardBool = true;
-                boatRotateY = -60;
+                TurtleRotateY = -60;
             }
 
             if (forwardBool == true) {
-                boatMoveX += boatSpeedX * boatSpeedVar;
-                boatMoveZ -= boatSpeedZ * boatSpeedVar;
+                TurtleMoveX += TurtleSpeedX * TurtleSpeedVar;
+                TurtleMoveZ -= TurtleSpeedZ * TurtleSpeedVar;
             } else {
-                boatMoveX -= boatSpeedX * boatSpeedVar;
-                boatMoveZ += boatSpeedZ * boatSpeedVar;
+                TurtleMoveX -= TurtleSpeedX * TurtleSpeedVar;
+                TurtleMoveZ += TurtleSpeedZ * TurtleSpeedVar;
             }
             main();
         }
-
-        function speedParent2() {
-            boatSpeedVar = document.getElementById("speedParent2").value; 
-            document.getElementById("sP2Label").innerHTML = boatSpeedVar;
+        function speedTurtle() {
+            TurtleSpeedVar = document.getElementById("speedTurtle").value; 
+            document.getElementById("TurtleLabel").innerHTML = TurtleSpeedVar;
         }
 
-        var flagBool = true, flagFlipBool = true, flagMove = -1, flagSpeed = 1;
-        var timer4 = setInterval(function(){ animateFlagMoveLoop() }, 10);
 
-        function stopChild2() {
-            if (flagBool == true) { flagBool = false; }
-            else { flagBool = true; }
+        //Setting for turtle hand
+        var HandBool = true, movementBool = true, HandMove = -1, HandSpeed = 2;
+        var timerHand = setInterval(function(){ animateHandMoveLoop() }, 10);
 
-            if (flagBool == true) {
-                timer4 = setInterval(function(){ animateFlagMoveLoop() }, 10);
-                document.getElementById("stopChild2").value = "Stop Child 2";
+        function stopHand() {
+            if (HandBool == true) { HandBool = false; }
+            else { HandBool = true; }
+
+            if (HandBool == true) {
+                timerHand = setInterval(function(){ animateHandMoveLoop() }, 10);
+                document.getElementById("stopHand").value = "Stop Hand";
             } else {
-                clearInterval(timer4);
-                document.getElementById("stopChild2").value = "Start Child 2";
+                clearInterval(timerHand);
+                document.getElementById("stopHand").value = "Start Hand";
             }
         }
 
-        function animateFlagMoveLoop() {
-            if (flagMove <= -1) { flagFlipBool = true; }
-            else if (flagMove >= 1) { flagFlipBool = false; }
+        function animateHandMoveLoop() {
+            if (HandMove <= -1) { movementBool = true; }
+            else if (HandMove >= 1) { movementBool = false; }
 
-            if (flagFlipBool == true) { flagMove += (flagSpeed * 0.0174533); }
-            else { flagMove -= (flagSpeed * 0.0174533); }
+            if (movementBool == true) { HandMove += (HandSpeed * 0.0174533); }
+            else { HandMove -= (HandSpeed * 0.0174533); }
 
             main();
         }
 
-        function speedChild2() {
-            flagSpeed = document.getElementById("speedChild2").value; 
-            document.getElementById("sC2Label").innerHTML = flagSpeed;
+        function speedHand() {
+            HandSpeed = document.getElementById("speedHand").value; 
+            document.getElementById("HandLabel").innerHTML = HandSpeed;
         }
 
-        var boatColor = orangeColors, boatColorBool = true;
-        function colorParent2() {
-            if (boatColorBool == true) { boatColorBool = false; } 
-            else { boatColorBool = true; }
+        //Setting for colourRGB (pong)
+        var shellColour = turtleColour, turtleColorBool = true;
+        function colorTurtle() { //colorParent2
+            if (turtleColorBool == true) { turtleColorBool = false; } 
+            else { turtleColorBool = true; }
 
             alphaParent2(); 
             main();
         }
 
-        var flagColor = blueColors, flagColorBool = true;
-        function colorChild2() {
-            if (flagColorBool == true) { flagColorBool = false; } 
-            else { flagColorBool = true; }
+        var handColor =turtleHandColour, handColorBool = true;
+        function colorHand() { //colorChild2
+            if (handColorBool == true) { handColorBool = false; } 
+            else { handColorBool = true; }
 
-            if (flagColorBool == true) { flagColor = blueColors; }
-            else { flagColor = redColors; }
-
+            if (handColorBool == true) { handColor = turtleHandColour; }
+            else { handColor = brownColors; }
+            
             main();
         }
 
@@ -2321,28 +2719,192 @@
             alphaP2Value = document.getElementById("alphaParent2").value / 10; 
             document.getElementById("aP2Label").innerHTML = parseFloat(alphaP2Value).toFixed(1);;
 
-            if (boatColorBool == true) {
-                boatColor = [ // orangeColors
-                    [1, 0.812, 0, alphaP2Value],
-                    [1, 0.812, 0, alphaP2Value],
-                    [1, 0.812, 0, alphaP2Value],
-                    [1, 0.812, 0, alphaP2Value],
-                    [1, 0.812, 0, alphaP2Value],
-                    [1, 0.812, 0, alphaP2Value],
+            if (turtleColorBool == true) {
+                shellColour = [ // turtleColors
+                    [0.502, 1, 0.702, alphaP2Value],
+                    [0.502, 1, 0.702, alphaP2Value],
+                    [0.502, 1, 0.702, alphaP2Value],
+                    [0.502, 1, 0.702, alphaP2Value],
+                    [0.502, 1, 0.702, alphaP2Value],
+                    [0.502, 1, 0.702, alphaP2Value],
                 ];
             } else {
-                boatColor = [ // pinkColors
-                    [0.990, 0, 0.5, alphaP2Value],    
-                    [0.990, 0, 0.5, alphaP2Value],   
-                    [0.990, 0, 0.5, alphaP2Value],   
-                    [0.990, 0, 0.5, alphaP2Value],   
-                    [0.990, 0, 0.5, alphaP2Value],   
-                    [0.990, 0, 0.5, alphaP2Value],   
+                shellColour = [ // StrawberryColors
+                    [1, 0, 0.376, alphaP2Value],    
+                    [1, 0, 0.376, alphaP2Value],   
+                    [1, 0, 0.376, alphaP2Value],   
+                    [1, 0, 0.376, alphaP2Value],   
+                    [1, 0, 0.376, alphaP2Value],   
+                    [1, 0, 0.376, alphaP2Value],   
                 ];
             }
 
             main();
+        } 
+        //####################end of setting turtle###################
+
+
+        //###############################################
+        //Setting of jellyfish (Wong Jia Ying)
+        //###############################################
+        //adjust overall size of jellyfish
+        let JellyFishOverallScale = 0.6;
+
+        //movement Setting for jellyfish
+        var JellyFishMoveX = 2, JellyFishMoveY = 4, JellyFishMoveZ= -2, JellyFishSpeedX = 0.005, JellyFishSpeedZ = 0.003, JellyFishSpeedVar = 1;
+        var JellyFishBool = true, JellyFishForwardBool = true, JellyfishRotateY = 0;
+        var timerJellyFish = setInterval(function(){ animateJellyFishMoveLoop() }, 10);
+
+        //Animation for jellyfish pulsing
+        var JellyFishPulseBool = true, JellyFishPulseDirection = true, JellyFishPulseSpeed = 0.01;
+        var JellyFishPulseScale = 1.0;
+        var timerJellyFishPulse = setInterval(function() { animateJellyFishPulseLoop() }, 20); // Faster animation for pulse
+
+
+        function stopJellyFish() {
+            if (JellyFishBool == true) { JellyFishBool = false; }
+            else { JellyFishBool = true; }
+
+            if (JellyFishBool == true) {
+                timerJellyFish = setInterval(function(){ animateJellyFishMoveLoop() }, 10);
+                document.getElementById("stopJellyFish").value = "Stop JellyFish";
+            } else {
+                clearInterval(timerJellyFish);
+                document.getElementById("stopJellyFish").value = "Start JellyFish";
+            }
         }
+
+        function animateJellyFishMoveLoop() {
+            if (JellyFishMoveX > 5.0) {
+                JellyFishForwardBool = false;
+                JellyFishRotateY = 180;  //face the other way
+            } else if (JellyFishMoveX < -5.0) {
+                JellyFishForwardBool = true;
+                JellyFishRotateY = 0;  //face original way
+            }
+
+            if (JellyFishForwardBool == true) {
+                JellyFishMoveX += JellyFishSpeedX * JellyFishSpeedVar;
+                
+            } else {
+                JellyFishMoveX -= JellyFishSpeedX * JellyFishSpeedVar;
+                
+            }
+            main();
+        }
+
+        function animateJellyFishPulseLoop() {
+            if (JellyFishPulseDirection == true) {
+                JellyFishPulseScale += JellyFishPulseSpeed;
+                if (JellyFishPulseScale >= 1.1) { // Max scale
+                    JellyFishPulseDirection = false;
+                }
+            } else {
+                JellyFishPulseScale -= JellyFishPulseSpeed;
+                if (JellyFishPulseScale <= 0.9) { // Min scale
+                    JellyFishPulseDirection = true;
+                }
+            }
+            main();
+        }
+
+        function speedJellyFish() {
+            JellyFishSpeedVar = document.getElementById("speedJellyFish").value; 
+            document.getElementById("JellyFishLabel").innerHTML = JellyFishSpeedVar;
+        }
+
+        //Setting for JellyFish's tentacles animation
+        var JellyFishTentacleBool = true, JellyFishTentacleDirection = true, JellyFishTentacleMove= 0, JellyFishTentacleSpeed = 5;
+        var timerJellyFishTentacle = setInterval(function(){ animateJellyFishTentacleLoop() }, 20);  //sway speed
+
+        function stopJellyFishTentacle() {
+            if (JellyFishTentacleBool == true) { JellyFishTentacleBool = false; }
+            else {JellyFishTentacleBool = true; }
+
+            if (JellyFishTentacleBool == true) {
+                timerJellyFishTentacle = setInterval(function(){ animateJellyFishTentacleLoop() }, 20);
+                document.getElementById("stopJellyFishTentacle").value = "Stop Tentacles";
+            } else {
+                clearInterval(timerJellyFishTentacle);
+                document.getElementById("stopJellyFishTentacle").value = "Start Tentacles";
+            }
+        }
+
+        function animateJellyFishTentacleLoop() {
+            // simple swaying motion for tentacles
+            if (JellyFishTentacleDirection == true) {
+                JellyFishTentacleMove += (JellyFishTentacleSpeed * 0.0174533); // Move forward (rotate)
+                if (JellyFishTentacleMove >= 20 * 0.0174533) { // Max angle (20 degrees)
+                    JellyFishTentacleDirection = false;
+                }
+            } else {
+                JellyFishTentacleMove -= (JellyFishTentacleSpeed * 0.0174533); // Move backward (rotate)
+                if (JellyFishTentacleMove <= -20 * 0.0174533) { // Min angle (-20 degrees)
+                    JellyFishTentacleDirection = true;
+                }
+            }
+            main();
+        }
+
+        function speedJellyFishTentacle() {
+            JellyFishTentacleSpeed = document.getElementById("speedJellyFishTentacle").value; 
+            document.getElementById("TentacleLabel").innerHTML = JellyFishTentacleSpeed;
+        }
+
+        //Setting for JellyFish colourRGB (Wong Jia Ying)
+        var JellyFishBodyColour = JellyFishBodyColor;
+        var JellyFishBodyColorBool = true;
+
+        function colorJellyFishBody() { //colorParent2 renamed
+            if (JellyFishBodyColorBool == true) { JellyFishBodyColorBool = false; } 
+            else { JellyFishBodyColorBool = true; }
+
+            alphaJellyFishBody();  // Call alpha function to update color based on new bool state
+            main();
+        }
+
+        var JellyFishTentacleColour =JellyFishTentacleColor;
+        var JellyfishTentacleColorBool = true;
+        function colorJellyFishTentacle() { //colorChild2 renamed
+            if (JellyFishTentacleColorBool == true) { JellyFishTentacleColorBool = false; } 
+            else { JellyFishTentacleColorBool = true; }
+
+            if (JellyFishTentacleColorBool == true) { JellyFishTentacleColour = JellyFishTentacleColor; }
+            else { JellyFishTentacleColour = darkJellyFishTentacleColor; }  //darker shade for the alternate color
+            
+            main();
+        }
+
+        var alphaJellyFishValue = 1;
+        function alphaJellyFishBody() {
+            alphaJellyFishValue = document.getElementById("alphaJellyFish").value / 10; 
+            document.getElementById("alphaJellyFishLabel").innerHTML = parseFloat(alphaJellyFishValue).toFixed(1);;
+
+            if (JellyFishBodyColorBool == true) {
+                JellyFishBodyColour = [ // JellyFishBodyColor - light blue
+                    [0.7, 0.9, 1.0, alphaJellyFishValue], 
+                    [0.7, 0.9, 1.0, alphaJellyFishValue],
+                    [0.7, 0.9, 1.0, alphaJellyFishValue],
+                    [0.7, 0.9, 1.0, alphaJellyFishValue],
+                    [0.7, 0.9, 1.0, alphaJellyFishValue],
+                    [0.7, 0.9, 1.0, alphaJellyFishValue],
+                ];
+            } else {
+                JellyFishBodyColour = [ // Orange for alternate color
+                    [1, 0.5, 0.0, alphaJellyFishValue],    
+                    [1, 0.5, 0.0, alphaJellyFishValue],    
+                    [1, 0.5, 0.0, alphaJellyFishValue],    
+                    [1, 0.5, 0.0, alphaJellyFishValue],  
+                    [1, 0.5, 0.0, alphaJellyFishValue],    
+                    [1, 0.5, 0.0, alphaJellyFishValue],  
+                ];
+            }
+
+            main();
+        } 
+        //##################  end setting of jellyfish (wong jia ying)  ###################
+
+
     </script>
     <style>
         .sceneLabel {
@@ -2373,7 +2935,7 @@
     <div style="padding: 10px 0px 5px 0px;">
         <div style="padding-bottom:7px;">Drag mouse inside canvas to rotate ALL OBJECTS on x-axis and y-axis</div>
         <input type="button" id="resetBtn" value="Reset rotation" onclick="resetRotation()">
-        <br><div class="sceneLabel">Forest scene: Lake, tree/bush, rock, boat and Submarine</div>
+        <br><div class="sceneLabel">Forest scene: Turtle, JellyFish, SeaHorse and Submarine</div>
     </div>
 
     <canvas id="glCanvas" width="640" height="480"></canvas>
@@ -2430,53 +2992,61 @@
                 <br><input oninput="speedSubmarine()" id="speedSubmarine" type="range" min="1" max="10" value="1" style="width: 80%">
                 <hr width="80%">
                 <!-- child 1 -->
-                <input type="button" id="stopChild1" value="Stop Child 1" onclick="stopChild1()" style="margin-bottom: 5px;">
+                <input type="button" id="stopProp" value="Stop Propeller" onclick="stopProp()" style="margin-bottom: 5px;">
                 &nbsp;[ <span id="sC1Label">30</span> ]
-                <br><input oninput="speedChild1()" id="speedChild1" type="range" min="1" max="100" value="30" style="width: 80%">
+                <br><input oninput="speedProp()" id="speedProp" type="range" min="1" max="100" value="30" style="width: 80%">
                 <hr width="80%">
                 <!-- child 2 -->
-                <input type="button" id="stopTube" value="Stop Tube" onclick="stopTube()" style="margin-bottom: 5px;">
+                <input type="button" id="stopTube" value="Stop Periscope" onclick="stopTube()" style="margin-bottom: 5px;">
                 &nbsp;[ <span id="TubeLabel">30</span> ]
                 <br><input oninput="speedTube()" id="speedTube" type="range" min="1" max="100" value="30" style="width: 80%">
                 <hr width="80%">
                 <!-- color -->
-                RGB[A: <span id="aP1Label">1.0</span>]&nbsp; 
+                RGB[A: <span id="aPSubLabel">1.0</span>]&nbsp; 
                 <input type="button" id="colorSub" value="Sub" onclick="colorSub()" style="margin-bottom: 5px;">
-                <input type="button" id="colorSub2" value="Turbine" onclick="colorSub2()" style="margin-bottom: 5px;">
-                <br><input oninput="alphaParent1()" id="alphaParent1" type="range" min="0" max="10" value="10" style="width: 80%">
+                <input type="button" id="colorSub2" value="Propeller" onclick="colorSub2()" style="margin-bottom: 5px;">
+                <input type="button" id="colorSub3" value="Mirror" onclick="colorSub3()" style="margin-bottom: 5px;">
+                <input type="button" id="colorSub4" value="Frame" onclick="colorSub4()" style="margin-bottom: 5px;">
+                <br><input oninput="alphaSubmarine()" id="alphaSubmarine" type="range" min="0" max="10" value="10" style="width: 80%">
             </td>
 
             <td align="center">
-                <div class="objLabel">CD54321 SALIIMI: Boat</div><br>
-                <input type="button" id="stopParent2" value="Stop Parent 2" onclick="stopParent2()" style="margin-bottom: 5px;">
-                &nbsp;[ <span id="sP2Label">1</span> ]
-                <br><input oninput="speedParent2()" id="speedParent2" type="range" min="1" max="10" value="1" style="width: 80%">
+                <div class="objLabel">CD24041 Pong Jia Ni: Turtle</div><br>
+                <!-- parent -->
+                <input type="button" id="stopTurtle" value="Stop Turtle" onclick="stopTurtle()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="TurtleLabel">1</span> ]
+                <br><input oninput="speedTurtle()" id="speedTurtle" type="range" min="1" max="10" value="1" style="width: 80%">
                 <hr width="80%">
-                <input type="button" id="stopChild2" value="Stop Child 2" onclick="stopChild2()" style="margin-bottom: 5px;">
-                &nbsp;[ <span id="sC2Label">1</span> ]
-                <br><input oninput="speedChild2()" id="speedChild2" type="range" min="1" max="10" value="1" style="width: 80%">
+                <!-- child 1 -->
+                <input type="button" id="stopHand" value="StopHand" onclick="stopHand()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="HandLabel">1</span> ]
+                <br><input oninput="speedHand()" id="speedHand" type="range" min="1" max="10" value="1" style="width: 80%">
                 <hr width="80%">
+                <!-- color -->
                 RGB[A: <span id="aP2Label">1.0</span>]&nbsp; 
-                <input type="button" id="colorParent2" value="Parent 2" onclick="colorParent2()" style="margin-bottom: 5px;">
-                <input type="button" id="colorChild2" value="Child 2" onclick="colorChild2()" style="margin-bottom: 5px;">
+                <input type="button" id="colorTurtle" value="Turtle" onclick="colorTurtle()" style="margin-bottom: 5px;">
+                <input type="button" id="colorHand" value="Hand" onclick="colorHand()" style="margin-bottom: 5px;">
                 <br><input oninput="alphaParent2()" id="alphaParent2" type="range" min="0" max="10" value="10" style="width: 80%">
             </td>
-            <!-- UNCOMMENTS FOR OTHER MEMBERS -->
-            <!-- <td align="center">
-                <div class="objLabel">CD0000 NAME: Object name</div><br>
-                <input type="button" id="stopParent3" value="Stop Parent 3" onclick="stopParent3()" style="margin-bottom: 5px;">
-                &nbsp;[ <span id="sP3Label">1</span> ]
-                <br><input oninput="speedParent3()" id="speedParent3" type="range" min="1" max="10" value="1" style="width: 80%">
+
+            <td align="center">
+                <div class="objLabel">CD24051 WONG JIA YING: JellyFish</div><br>
+                <!--parent-->
+                <input type="button" id="stopJellyFish" value="Stop JellyFish" onclick="stopJellyFish()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="JellyFishLabel">1</span> ]
+                <br><input oninput="speedJellyFish()" id="speedJellyFish" type="range" min="1" max="10" value="1" style="width: 80%">
                 <hr width="80%">
-                <input type="button" id="stopChild3" value="Stop Child 3" onclick="stopChild3()" style="margin-bottom: 5px;">
-                &nbsp;[ <span id="sC3Label">1</span> ]
-                <br><input oninput="speedChild3()" id="speedChild3" type="range" min="1" max="10" value="1" style="width: 80%">
+                <!--child -->
+                <input type="button" id="stopJellyFishTentacle" value="Stop Tentacles" onclick="stopJellyFishTentacle()" style="margin-bottom: 5px;">
+                &nbsp;[ <span id="TentacleLabel">1</span> ]
+                <br><input oninput="speedJellyFishTentacle()" id="speedJellyFishTentacle" type="range" min="1" max="10" value="1" style="width: 80%">
                 <hr width="80%">
-                RGB[A: <span id="aP3Label">1.0</span>]&nbsp; 
-                <input type="button" id="colorParent3" value="Parent 3" onclick="colorParent3()" style="margin-bottom: 5px;">
-                <input type="button" id="colorChild3" value="Child 3" onclick="colorChild3()" style="margin-bottom: 5px;">
-                <br><input oninput="alphaParent3()" id="alphaParent3" type="range" min="0" max="10" value="10" style="width: 80%">
-            </td> -->
+                <!--colour-->
+                RGB[A: <span id="alphaJellyFishLabel">1.0</span>]&nbsp; 
+                <input type="button" id="colorJellyFishBody" value="JellyFish Body" onclick="colorJellyFishBody()" style="margin-bottom: 5px;">
+                <input type="button" id="colorJellyFishTentacle" value="Tentacles" onclick="colorJellyFishTentacle()" style="margin-bottom: 5px;">
+                <br><input oninput="alphaJellyFishBody()" id="alphaJellyFish" type="range" min="0" max="10" value="10" style="width: 80%">
+            </td> 
         </tr> 
     </table>
 </body>
